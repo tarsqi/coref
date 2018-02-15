@@ -19,6 +19,7 @@ public class Tarsqi {
 		//runStanfordOnThymeFiles();
 		//runStanfordOnThymeDirectory();		
 		loadTarsqiAndStanfordDocuments();
+		
 	}
 
 	static void runStanfordOnThymeFiles() {
@@ -26,9 +27,8 @@ public class Tarsqi {
 		// the lasst of these throws an XML error that needs to be solved
 		String input_dir = THYME_CORPUS + "train/ttk-output/";
 		String output_dir = THYME_CORPUS + "train/stanford-output/";
-		String[] reports = { 
-			"ID001_clinic_001", "ID001_clinic_003",
-			"ID009_clinic_025", "doc0003_CLIN" };
+		String[] reports = { "ID001_clinic_001", "ID001_clinic_003" };
+		// "ID001_clinic_001", "ID001_clinic_003",	"ID009_clinic_025", "doc0003_CLIN" };
 		for (int i = 0 ; i < reports.length ; i++)
 			runStanfordOnFile(input_dir + reports[i], output_dir + reports[i]);
 		//runStanfordOnFile(input_dir + "ID009_clinic_025", output_dir + "ID009_clinic_025");
@@ -75,6 +75,8 @@ public class Tarsqi {
 			String stanfordFile = stanfordDir + reports[i];
 			TarsqiDocument tarsqiDoc = new TarsqiReader().read(tarsqiFile);
 			StanfordDocument stanfordDoc = new StanfordDocument(stanfordFile);
+			tarsqiDoc.prettyPrint();
+			stanfordDoc.prettyPrint();
 		}
 	}
 }

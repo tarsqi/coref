@@ -6,21 +6,18 @@ import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.IndexedWord;
+import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.EnhancedPlusPlusDependenciesAnnotation;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
+import edu.stanford.nlp.trees.Dependency;
+import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +27,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 
 public class StanfordNLP {
@@ -62,9 +61,9 @@ public class StanfordNLP {
 	 */
 	public Annotation processString(String input) {
 		// create an empty Annotation and run all Annotators on the input
-		Annotation document = new Annotation(input);
-		this.pipeline.annotate(document);
-		return document;
+		Annotation anno = new Annotation(input);
+		this.pipeline.annotate(anno);
+		return anno;
 	}
 
 	/**
@@ -105,7 +104,6 @@ public class StanfordNLP {
 
 	public void show(Annotation document) {
 		
-		// all the sentences in the input
 		// CoreMap: a Map that uses class objects as keys and has values with custom types
 		// CoreLabel: a CoreMap with additional token-specific methods
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
@@ -146,53 +144,47 @@ public class StanfordNLP {
 	}
 	
 	public void export(String docname, Annotation document, String filename) {
-
-		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-		StringBuilder sb = new StringBuilder();
-		sb.append(docname + "\n\n");
-		for (CoreMap sentence : sentences) {
-			collectDependencies(sentence, sb); }
-
-		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-              new FileOutputStream(filename), "utf-8"))) {
-			writer.write(sb.toString());
-		} catch (UnsupportedEncodingException ex) {
-			Logger.getLogger(StanfordNLP.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IOException ex) {
-			Logger.getLogger(StanfordNLP.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		
-	}
-
-	private void collectDependencies(CoreMap sentence, StringBuilder sb) {
-
-		SemanticGraph dependencies = sentence.get(EnhancedPlusPlusDependenciesAnnotation.class);
-		if (dependencies == null) return;
 	
-		StanfordToken root = new StanfordToken(dependencies.getFirstRoot());
-			
-		sb.append(String.format("\nROOT\t%s\t%s\t%s\n\n", root.start, root.end, root.lemma));
-		for (SemanticGraphEdge edge : dependencies.edgeListSorted()) {
-			StanfordDependency dep = new StanfordDependency(edge);
-			sb.append(String.format(
-					"DEPENDENCY\t%s:%s\t%s:%s\t%s\n", 
-					dep.governor.start, dep.governor.end,
-					dep.dependent.start, dep.dependent.end, dep.relation));
-		}
-			
-		sb.append("\n");
-		Set<IndexedWord> leaves = dependencies.getLeafVertices();
-		for (IndexedWord leaf : leaves) {
-			List<IndexedWord> catpath = dependencies.getPathToRoot(leaf);
-			List<SemanticGraphEdge> relpath = dependencies.getShortestUndirectedPathEdges(leaf, dependencies.getFirstRoot());
-			sb.append(String.format("CATPATH\t%s:%s\t%s", leaf.beginPosition(), leaf.endPosition(), leaf.tag()));
-			for (IndexedWord w : catpath)
-				sb.append(String.format("\t%s", w.tag()));
-			sb.append("\n");
-			sb.append(String.format("RELPATH\t%s:%s\t%s", leaf.beginPosition(), leaf.endPosition(), leaf.tag()));
-			for (SemanticGraphEdge rel : relpath)
-				sb.append(String.format("\t%s", rel.getRelation()));
-			sb.append("\n");
+		try {
+			StanfordWriter writer = new StanfordWriter();
+			writer.setFileName(docname);
+			for (CoreMap sentence : document.get(SentencesAnnotation.class)) {
+				writer.addSentence();
+				for (CoreLabel token : sentence.get(TokensAnnotation.class))
+					writer.addToken(new StanfordToken(token));
+				if (useParser) {
+					Tree tree = sentence.get(TreeAnnotation.class);
+					List<Tree> allLeaves = tree.getLeaves();
+					writer.addParse(tree.toString());
+					for (Tree leaf : allLeaves) {
+						writer.addPathsToRoot(tree, leaf);
+					}
+					// This gives a nullpointer error on the dependencies() method
+					// Set<Dependency<Label, Label, Object>> deps = tree.dependencies();
+					// for (Dependency<Label, Label, Object> dep : deps) {
+					//	System.out.println(dep);
+					//	System.out.println(new StanfordDependency(dep)); }
+				}
+					
+				if (useDependencyParser) {
+					SemanticGraph dependencies = sentence.get(EnhancedPlusPlusDependenciesAnnotation.class);
+					IndexedWord root = dependencies.getFirstRoot();
+					writer.addRoot(new StanfordToken(root));
+					for (SemanticGraphEdge edge : dependencies.edgeListSorted())
+						writer.addDependency(new StanfordDependency(edge));
+					Set<IndexedWord> leaves = dependencies.getLeafVertices();
+					for (IndexedWord leaf : leaves) {
+						writer.addPath(
+							leaf, 
+							dependencies.getPathToRoot(leaf),
+							dependencies.getShortestUndirectedPathEdges(leaf, root)); }
+				}
+			}
+			writer.write(filename);
+		} catch (ParserConfigurationException ex) {
+			Logger.getLogger(StanfordNLP.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (TransformerException ex) {
+			Logger.getLogger(StanfordNLP.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 

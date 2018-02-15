@@ -26,8 +26,7 @@ public class TarsqiDocument {
 		this.tlinks = new ArrayList<>(); }
 
 	public boolean isValid() {
-		if (this.text == null) return false;
-		return true; }
+		return this.text != null; }
 	
 	public void addText(String text) { this.text = text; }
 	public void addEvent(Event e) { this.events.add(e); }
@@ -38,19 +37,16 @@ public class TarsqiDocument {
 
 	public void prettyPrint() {
 		System.out.println(String.format("<TarsqiDocument %s>", this.filename));
-		int c = 0;
-		for (Event e : this.events) {
-			if (c++ >= 10) break;
-			System.out.println("   " + e); }
-		for (Timex t : this.timexes)
-			System.out.println("   " + t);
-		for (ALink t : this.alinks) {
-			System.out.println("   " + t); }
-		for (SLink t : this.slinks) {
-			System.out.println("   " + t); }
-		c = 0;
-		for (TLink t : this.tlinks) {
-			if (c++ >= 10) break;
-			System.out.println("   " + t); }
+		int max = 3;
+		for (int i = 0 ; i < this.events.size() && i < max ; i++)
+			System.out.println("   " + this.events.get(i));
+		for (int i = 0 ; i < this.timexes.size() && i < max ; i++)
+			System.out.println("   " + this.timexes.get(i));
+		for (int i = 0 ; i < this.alinks.size() && i < max ; i++)
+			System.out.println("   " + this.alinks.get(i));
+		for (int i = 0 ; i < this.slinks.size() && i < max ; i++)
+			System.out.println("   " + this.slinks.get(i));
+		for (int i = 0 ; i < this.tlinks.size() && i < max ; i++)
+			System.out.println("   " + this.tlinks.get(i));
 	}
 }
