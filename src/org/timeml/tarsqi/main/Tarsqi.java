@@ -75,8 +75,11 @@ public class Tarsqi {
 			String stanfordFile = stanfordDir + reports[i];
 			TarsqiDocument tarsqiDoc = new TarsqiReader().read(tarsqiFile);
 			StanfordDocument stanfordDoc = new StanfordDocument(stanfordFile);
+			System.out.println();
 			tarsqiDoc.prettyPrint();
+			System.out.println();
 			stanfordDoc.prettyPrint();
+			System.out.println();
 		}
 	}
 }

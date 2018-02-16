@@ -2,9 +2,7 @@ package org.timeml.tarsqi.tools.stanford;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,17 +30,23 @@ public class StanfordDocument {
 	public StanfordDocument(String filename) {
 
 		this.filename = filename;
+		this.sentences = new ArrayList();
 		readXML(filename);
-		NodeList sentences = this.doc.getElementsByTagName("sentence");
+		NodeList sentenceNodes = this.doc.getElementsByTagName("sentence");
 		Node sentence;
-		for (int i = 0; i < sentences.getLength(); i++) {
-			sentence = sentences.item(i);
-			this.sentences.add(new StandfordSentence(sentence));
-		}
+		for (int i = 0; i < sentenceNodes.getLength(); i++)
+			this.sentences.add(new StanfordSentence(i, sentenceNodes.item(i)));
 	}
 
-	private boolean isValid() {
+	public boolean isValid() {
 		return this.doc != null; }
+
+	public int getTokenCount() {
+		int count = 0;
+		for (int i = 0; i < this.sentences.size(); i++)
+			count += this.sentences.get(i).length();
+		return count;
+	}
 	
 	private void readXML(String filename) {
 		
@@ -62,11 +66,13 @@ public class StanfordDocument {
 
 	@Override
 	public String toString() {
-		return String.format("<StanfordDocument %s", this.filename); }
+		return String.format("<StanfordDocument %s>", this.filename); }
 	
 	public void prettyPrint() {
 		System.out.println(this);
-		System.out.println();
+		System.out.print(String.format(
+				"   { size: %d sentences and %d tokens }", 
+				this.sentences.size(), this.getTokenCount()));
 	}
 
 	public void printXML() {

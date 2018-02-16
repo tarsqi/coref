@@ -102,7 +102,7 @@ public class StanfordWriter {
 		Attr attr;
 		Element dep = doc.createElement("dependency");
 		String[][] attrs = { 
-			pair("relation", stanfordDependency.relation.getLongName()),
+			pair("relation", stanfordDependency.relation),
 			pair("governor", stanfordDependency.governor.index),
 			pair("dependent", stanfordDependency.dependent.index) };
 		addAttrs(dep, attrs);

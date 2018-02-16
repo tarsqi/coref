@@ -2,6 +2,8 @@ package org.timeml.tarsqi.tools.stanford;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.IndexedWord;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Class to represent a Stanford token. 
@@ -13,7 +15,7 @@ import edu.stanford.nlp.ling.IndexedWord;
 public class StanfordToken {
 	
 	public int start, end, index;
-	public String word, lemma, pos, ne;
+	public String word, lemma, pos;
 	
 	StanfordToken(CoreLabel token) {
 		this.index = token.index();
@@ -22,7 +24,6 @@ public class StanfordToken {
 		this.word = token.word();
 		this.lemma = token.lemma();
 		this.pos = token.tag();
-		this.ne = token.ner();
 	}
 
 	StanfordToken(IndexedWord token) {
@@ -32,7 +33,16 @@ public class StanfordToken {
 		this.word = token.word();
 		this.lemma = token.lemma();
 		this.pos = token.tag();
-		this.ne = token.ner();
+	}
+
+	StanfordToken(Node token) {
+		Element element = (Element) token;
+		this.index = Integer.parseInt(element.getAttribute("index"));
+		this.start = Integer.parseInt(element.getAttribute("start"));
+		this.end = Integer.parseInt(element.getAttribute("end"));
+		this.word = element.getAttribute("word");
+		this.lemma = element.getAttribute("lemma");
+		this.pos = element.getAttribute("pos");
 	}
 	
 	@Override
