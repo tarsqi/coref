@@ -38,7 +38,7 @@ public class Tarsqi {
 		System.out.println(infile);
 		TarsqiDocument doc = new TarsqiReader().read(infile);
 		if (doc.isValid()) {
-			StanfordNLP snlp = new StanfordNLP();
+			StanfordNLP snlp = new StanfordNLP("depparse");
 			Annotation document = snlp.processString(doc.text);
 			snlp.export(doc.filename, document, outfile); }
 	}
@@ -49,7 +49,7 @@ public class Tarsqi {
 		File folder = new File(IN);
 		String[] files = folder.list();
 		Arrays.sort(files);
-		StanfordNLP snlp = new StanfordNLP();
+		StanfordNLP snlp = new StanfordNLP("depparse");
 		for (String file : files) {
 			System.out.println(file);
 			String infile = IN + "/" + file;

@@ -6,13 +6,11 @@ import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.IndexedWord;
-import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.EnhancedPlusPlusDependenciesAnnotation;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.BasicDependenciesAnnotation;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
-import edu.stanford.nlp.trees.Dependency;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
@@ -20,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -37,19 +36,19 @@ public class StanfordNLP {
 	//public Annotation document;
 	public StanfordCoreNLP pipeline;
 	
-	boolean useNER = false;
-	boolean useParser = false;
-	boolean useDependencyParser = true;
-	boolean useCoreference = false;
+	boolean ner = false;
+	boolean parse = false;
+	boolean depparse = false;
+	boolean coref = false;
 	
-	public StanfordNLP() {
+	public StanfordNLP(String components) {
 		// creates a StanfordCoreNLP object, with tokenizer, splitter, tagger and 
 		// lemmatizer, plus some others as defined by the boolean properties 
 		// useNER, useParser etcetera.
 		//if (this.pipeline == null) {
 		//System.out.println(">>> Initializing pipeline...");
 		Properties props = new Properties();
-		props.setProperty("annotators", annotators());
+		props.setProperty("annotators", annotators(components));
 		this.pipeline = new StanfordCoreNLP(props); //}
 	}
 	
@@ -92,13 +91,23 @@ public class StanfordNLP {
 		} 
 	}
 	
-	private String annotators() {
-		List<String> x = new ArrayList<>();
+	private String annotators(String components) {
+		Set<String> comps = new HashSet(Arrays.asList(components.split("\\s+")));
+		//List<String> x = new ArrayList<>();
+		// always use basic processing
 		StringBuilder sb = new StringBuilder("tokenize, ssplit, pos, lemma");
-		if (useNER) sb.append(", ner");
-		if (useParser) sb.append(", parse");
-		if (useDependencyParser) sb.append(", depparse");
-		if (useCoreference) sb.append(", coref");		
+		if (comps.contains("ner")) {
+			this.ner = true;
+			sb.append(", ner"); }
+		if (comps.contains("parse")) {
+			this.parse = true;
+			sb.append(", parse"); }
+		if (comps.contains("depparse")) {
+			this.depparse = true;
+			sb.append(", depparse"); }
+		if (comps.contains("coref")) {
+			this.coref = true;
+			sb.append(", coref"); }	
 		return sb.toString();
 	}
 
@@ -116,13 +125,13 @@ public class StanfordNLP {
 				System.out.println(new StanfordToken(token));
 
 			// parse tree
-			if (useParser)
+			if (parse)
 				System.out.println(sentence.get(TreeAnnotation.class));
 			
 			// dependency graph
 			// https://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/semgraph/SemanticGraph.html
-			if (useDependencyParser) {
-				SemanticGraph dependencies = sentence.get(EnhancedPlusPlusDependenciesAnnotation.class);
+			if (depparse) {
+				SemanticGraph dependencies = sentence.get(BasicDependenciesAnnotation.class);
 				StanfordToken root = new StanfordToken(dependencies.getFirstRoot());
 				System.out.println(dependencies);
 				System.out.println("ROOT = " + root + "\n");
@@ -138,9 +147,22 @@ public class StanfordNLP {
 		// Each chain stores a set of mentions that link to each other,
 		// along with a method for getting the most representative mention
 		// Both sentence and token offsets start at 1!
-		if (useCoreference) {
+		if (coref) {
 			Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
 		}
+	}
+
+	void showSentences(Annotation anno) {
+		List<CoreMap> sentences = anno.get(SentencesAnnotation.class);
+		for (CoreMap sentence : sentences)
+			//String s = sentence.toString();
+			System.out.println(sentence.toString().replaceAll("\\s+"," "));
+	}
+
+	void showParses(Annotation anno) {
+		List<CoreMap> sentences = anno.get(SentencesAnnotation.class);
+		for (CoreMap sentence : sentences) 
+			System.out.println(sentence.get(TreeAnnotation.class));
 	}
 	
 	public void export(String docname, Annotation document, String filename) {
@@ -152,7 +174,7 @@ public class StanfordNLP {
 				writer.addSentence();
 				for (CoreLabel token : sentence.get(TokensAnnotation.class))
 					writer.addToken(new StanfordToken(token));
-				if (useParser) {
+				if (parse) {
 					Tree tree = sentence.get(TreeAnnotation.class);
 					List<Tree> allLeaves = tree.getLeaves();
 					writer.addParse(tree.toString());
@@ -166,8 +188,8 @@ public class StanfordNLP {
 					//	System.out.println(new StanfordDependency(dep)); }
 				}
 					
-				if (useDependencyParser) {
-					SemanticGraph dependencies = sentence.get(EnhancedPlusPlusDependenciesAnnotation.class);
+				if (depparse) {
+					SemanticGraph dependencies = sentence.get(BasicDependenciesAnnotation.class);
 					IndexedWord root = dependencies.getFirstRoot();
 					writer.addRoot(new StanfordToken(root));
 					for (SemanticGraphEdge edge : dependencies.edgeListSorted())

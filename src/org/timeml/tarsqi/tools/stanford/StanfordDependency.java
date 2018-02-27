@@ -11,7 +11,7 @@ public class StanfordDependency {
 	public String relation;
 	
 	public StanfordDependency(SemanticGraphEdge edge) {
-		this.relation = edge.getRelation().getLongName();
+		this.relation = edge.getRelation().getShortName();
 		this.governor = new StanfordToken(edge.getGovernor());
 		this.dependent = new StanfordToken(edge.getDependent());
 	}

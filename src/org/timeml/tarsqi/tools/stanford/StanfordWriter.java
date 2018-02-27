@@ -117,11 +117,15 @@ public class StanfordWriter {
 		StringBuilder sb = new StringBuilder();
 		for (IndexedWord w : catpath)
 			sb.append(String.format(" %s", w.tag()));
-		String cats = sb.toString().substring(1);
+		String cats = sb.toString();
+		if (cats.length() > 0) {
+			cats = cats.substring(1); }
 		sb = new StringBuilder();
 		for (SemanticGraphEdge rel : relpath)
 			sb.append(String.format(" %s", rel.getRelation()));
-		String rels = sb.toString().substring(1);
+		String rels = sb.toString();
+		if (rels.length() > 0) {
+			rels = rels.substring(1); }
 		Attr attr;
 		Element path = doc.createElement("path");
 		String[][] attrs = {

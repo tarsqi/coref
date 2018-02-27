@@ -36,7 +36,7 @@ public class Coref {
 
 	public static void runStanford(String input) {
 		System.out.println(input);
-		StanfordNLP stan = new StanfordNLP();
+		StanfordNLP stan = new StanfordNLP("depparse");
 		Annotation annotation = stan.processString(input);
 		stan.show(annotation);
 		//Annotation doc = stan.document;
