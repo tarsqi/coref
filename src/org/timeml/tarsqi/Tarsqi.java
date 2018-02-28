@@ -1,4 +1,4 @@
-package org.timeml.tarsqi.main;
+package org.timeml.tarsqi;
 
 import edu.stanford.nlp.pipeline.Annotation;
 import java.io.File;
@@ -18,9 +18,9 @@ public class Tarsqi {
 	public static void main(String[] args) {
 
 		//runStanfordOnThymeFiles();
-		//runStanfordOnThymeDirectory();		
+		//runStanfordOnThymeDirectory();
 		//loadTarsqiAndStanfordDocuments();
-		//runSectioner("src/resources/test.ttk");
+		//runSectioner("src/resources/texst.ttk");
 		runSectioner("src/resources/sectioner.ttk");
 		
 	}

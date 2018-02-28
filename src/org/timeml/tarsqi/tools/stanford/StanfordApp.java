@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.timeml.tarsqi.core.TarsqiDocument;
 import org.timeml.tarsqi.core.TarsqiReader;
-import static org.timeml.tarsqi.main.Tarsqi.THYME_CORPUS;
+import static org.timeml.tarsqi.Tarsqi.THYME_CORPUS;
 
 public class StanfordApp {
 

@@ -93,13 +93,16 @@ public class Sectioner {
 	 */
 	private void processParagraphs() {
 		for (DocElement para : this.paras) {
-			if (para.isListing())
+			if (para.isListing()) {
 				para.type = Sectioner.LISTING;
-			else if (para.isHeader()) 
+			} else if (para.isHeader()) {
 				para.type = Sectioner.HEADER;
-			else if (para.hasAllCapsPrefix())
+				para.text = para.dtrs.get(0).text;
+				para.dtrs = new ArrayList<>();
+			} else if (para.hasAllCapsPrefix()) {
 				// this is a Thyme specific thing, but it may generalize
 				para.splitOnPrefix();
+			}
 		}
 	}
 	
