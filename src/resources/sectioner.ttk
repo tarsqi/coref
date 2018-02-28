@@ -1,0 +1,32 @@
+<ttk>
+<text>
+
+Simple Header
+
+Heigth: 124in
+Weight: 143lb
+Eyes: blue
+
+THIS IS A HEADER. Mr. Vinken got the flue on Nov. They heard an explosion on Monday,
+but not in 2007.
+
+Since it is in the middle THIS IS NOT A HEADER in this case. This reminded them of the 1968
+war, which ravaged the countryside in 1969. He slept on Friday night. He began
+to sleep. He is eager to sleep. AND THIS IS NOT A HEADER EITHER. So be it.
+
+Here is a short line, but too long for a para.
+Which is clear because of the period and therefore we do not want to make the previous line a standalone paragraph.
+
+ANOTHER HEADER followed by some text, rather tricky, should test for a capital.
+
+And a line at the end not followed by an empty line to make sure it is included.
+</text>
+<metadata>
+  <dct value="20180216"/>
+  <processing_steps>
+    <processing_step  ttk_version="2.1.0" git_commit="7cc7060" timestamp="20180216-130947" components="PREPROCESSOR,GUTIME,EVITA,SLINKET,S2T,BLINKER,CLASSIFIER"/>
+  </processing_steps>
+</metadata>
+<source_tags></source_tags>
+<tarsqi_tags></tarsqi_tags>
+</ttk>

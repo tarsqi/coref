@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.timeml.tarsqi.components.Sectioner;
 import org.timeml.tarsqi.core.TarsqiDocument;
 import org.timeml.tarsqi.core.TarsqiReader;
 import org.timeml.tarsqi.tools.stanford.StanfordDocument;
@@ -18,7 +19,9 @@ public class Tarsqi {
 
 		//runStanfordOnThymeFiles();
 		//runStanfordOnThymeDirectory();		
-		loadTarsqiAndStanfordDocuments();
+		//loadTarsqiAndStanfordDocuments();
+		//runSectioner("src/resources/test.ttk");
+		runSectioner("src/resources/sectioner.ttk");
 		
 	}
 
@@ -81,5 +84,13 @@ public class Tarsqi {
 			stanfordDoc.prettyPrint();
 			System.out.println();
 		}
+	}
+
+	private static void runSectioner(String filename) {
+		TarsqiDocument tarsqiDoc = new TarsqiReader().read(filename);
+		Sectioner sectioner = new Sectioner(tarsqiDoc);
+		sectioner.parse();
+		//System.out.println(tarsqiDoc);
+		//tarsqiDoc.prettyPrint();
 	}
 }
