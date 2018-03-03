@@ -1,4 +1,4 @@
-package org.timeml.tarsqi.coref;
+package org.timeml.tarsqi.io;
 
 import java.io.File;
 

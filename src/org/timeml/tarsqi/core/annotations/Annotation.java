@@ -1,4 +1,4 @@
-package org.timeml.tarsqi.core.categories;
+package org.timeml.tarsqi.core.annotations;
 
 import java.util.HashMap;
 import org.w3c.dom.NamedNodeMap;
@@ -14,13 +14,13 @@ import org.w3c.dom.Node;
 // and we have an event would the id then always need to be copied from the eid
 // or the eiid?
 
-public class Category {
+public class Annotation {
 
 	public final String tagName;
 	protected final Node dom;
 	protected final HashMap attributes;
 	
-	Category(Node node) {
+	Annotation(Node node) {
 		this.dom = node;
 		this.tagName = node.getNodeName();
 		this.attributes = new HashMap();

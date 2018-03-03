@@ -1,11 +1,12 @@
-package org.timeml.tarsqi.coref;
+package org.timeml.tarsqi.components;
 
+import org.timeml.tarsqi.io.ThymeFile;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import edu.stanford.nlp.pipeline.Annotation;
 
 import java.util.List;
 import org.timeml.tarsqi.core.TarsqiDocument;
-import org.timeml.tarsqi.core.TarsqiReader;
+import org.timeml.tarsqi.io.TarsqiReader;
 
 
 public class Coref {

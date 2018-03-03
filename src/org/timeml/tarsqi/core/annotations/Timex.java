@@ -1,6 +1,6 @@
-package org.timeml.tarsqi.core.categories;
+package org.timeml.tarsqi.core.annotations;
 
-import org.timeml.tarsqi.core.categories.Entity;
+import org.timeml.tarsqi.core.annotations.Entity;
 import org.w3c.dom.Node;
 
 public class Timex extends Entity {

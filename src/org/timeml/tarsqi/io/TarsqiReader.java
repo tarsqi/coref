@@ -1,4 +1,4 @@
-package org.timeml.tarsqi.core;
+package org.timeml.tarsqi.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,11 +9,12 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.timeml.tarsqi.core.categories.ALink;
-import org.timeml.tarsqi.core.categories.Event;
-import org.timeml.tarsqi.core.categories.SLink;
-import org.timeml.tarsqi.core.categories.TLink;
-import org.timeml.tarsqi.core.categories.Timex;
+import org.timeml.tarsqi.core.TarsqiDocument;
+import org.timeml.tarsqi.core.annotations.ALink;
+import org.timeml.tarsqi.core.annotations.Event;
+import org.timeml.tarsqi.core.annotations.SLink;
+import org.timeml.tarsqi.core.annotations.TLink;
+import org.timeml.tarsqi.core.annotations.Timex;
 import org.w3c.dom.Document;	
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

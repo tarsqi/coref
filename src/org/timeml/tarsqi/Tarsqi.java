@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import org.timeml.tarsqi.components.DocElement;
 import org.timeml.tarsqi.components.Sectioner;
 import org.timeml.tarsqi.core.TarsqiDocument;
-import org.timeml.tarsqi.core.TarsqiReader;
+import org.timeml.tarsqi.io.TarsqiReader;
 import org.timeml.tarsqi.tools.stanford.StanfordDocument;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 

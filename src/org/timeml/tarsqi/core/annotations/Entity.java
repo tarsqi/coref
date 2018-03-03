@@ -1,8 +1,8 @@
-package org.timeml.tarsqi.core.categories;
+package org.timeml.tarsqi.core.annotations;
 
 import org.w3c.dom.Node;
 
-public class Entity extends Category {
+public class Entity extends Annotation {
 
 	public Entity(Node node) {
 		super(node); }

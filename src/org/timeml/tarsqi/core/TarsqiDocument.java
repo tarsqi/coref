@@ -1,11 +1,11 @@
 package org.timeml.tarsqi.core;
 
 import java.util.ArrayList;
-import org.timeml.tarsqi.core.categories.ALink;
-import org.timeml.tarsqi.core.categories.Event;
-import org.timeml.tarsqi.core.categories.SLink;
-import org.timeml.tarsqi.core.categories.TLink;
-import org.timeml.tarsqi.core.categories.Timex;
+import org.timeml.tarsqi.core.annotations.ALink;
+import org.timeml.tarsqi.core.annotations.Event;
+import org.timeml.tarsqi.core.annotations.SLink;
+import org.timeml.tarsqi.core.annotations.TLink;
+import org.timeml.tarsqi.core.annotations.Timex;
 
 public class TarsqiDocument {
 

@@ -1,4 +1,4 @@
-package org.timeml.tarsqi.core.categories;
+package org.timeml.tarsqi.core.annotations;
 
 import java.util.ArrayList;
 import java.util.List;
