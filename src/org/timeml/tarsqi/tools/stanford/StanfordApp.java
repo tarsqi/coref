@@ -39,7 +39,7 @@ public class StanfordApp {
 	}
 
 	private static void runOnTarsqiFile(String components, String tarsqiFile, String stanfordFile) {
-		TarsqiDocument tarsqiDoc = new TarsqiReader().read(tarsqiFile);
+		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
 		StanfordNLP snlp = new StanfordNLP(components);
 		Annotation anno = snlp.processString(tarsqiDoc.text);
 		snlp.show(anno);
@@ -48,7 +48,7 @@ public class StanfordApp {
 
 	private static void getSentences() {
 		String tarsqiFile = THYME_CORPUS + "train/ttk-output/ID001_clinic_003";
-		TarsqiDocument tarsqiDoc = new TarsqiReader().read(tarsqiFile);
+		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
 		StanfordNLP snlp = new StanfordNLP("");
 		Annotation anno = snlp.processString(tarsqiDoc.text);
 		snlp.showSentences(anno);

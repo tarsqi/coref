@@ -16,6 +16,7 @@ public class TarsqiDocument {
 	public ArrayList<ALink> alinks;
 	public ArrayList<SLink> slinks;
 	public ArrayList<TLink> tlinks;
+	public ArrayList<AnnotationLayer> layers;
 	
 	public TarsqiDocument(String filename) {
 		this.filename = filename;
@@ -23,8 +24,9 @@ public class TarsqiDocument {
 		this.timexes = new ArrayList<>();
 		this.alinks = new ArrayList<>();
 		this.slinks = new ArrayList<>();
-		this.tlinks = new ArrayList<>(); }
-
+		this.tlinks = new ArrayList<>();
+		this.layers = new ArrayList<>(); }
+	
 	public boolean isValid() {
 		return this.text != null; }
 	
@@ -36,7 +38,7 @@ public class TarsqiDocument {
 	public void addTLink(TLink l) { this.tlinks.add(l); }
 
 	public void prettyPrint() {
-		System.out.println(String.format("<TarsqiDocument %s>", this.filename));
+		System.out.println(String.format("<TarsqiDocument '%s'>", this.filename));
 		int max = 3;
 		for (int i = 0 ; i < this.events.size() && i < max ; i++)
 			System.out.println("   " + this.events.get(i));

@@ -16,7 +16,6 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +55,7 @@ public class StanfordNLP {
 	 * Run Stanford CoreNLP on a string.
 	 * 
 	 * @param input The input String 
-	 * @return 
+	 * @return An Annotation instance with all annotations from the pipeline
 	 */
 	public Annotation processString(String input) {
 		// create an empty Annotation and run all Annotators on the input
@@ -69,7 +68,7 @@ public class StanfordNLP {
 	 * Run Stanford CoreNLP on a file.
 	 * 
 	 * @param input The input file
-	 * @return 
+	 * @return An Annotation instance or null if the file was not found.
 	 */
 	public Annotation processFile(File input) {
 		try {

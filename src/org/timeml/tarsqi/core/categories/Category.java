@@ -4,6 +4,16 @@ import java.util.HashMap;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+// Maybe call this Annotation and rename the package
+
+// Now it is always created from an XML node, will probably need other ways to
+// create one and maybe do not want to keep the the dom node in this.dom.
+
+// Could have the same setup as an ANnoation in LIF, with type, id, start, end
+// and a feature dictionary (here called attributes). Question: if we have id
+// and we have an event would the id then always need to be copied from the eid
+// or the eiid?
+
 public class Category {
 
 	public final String tagName;
@@ -21,11 +31,23 @@ public class Category {
 			this.attributes.put(x, y);
 		}
 	}
-	
-	public String getOrigin() { return (String) this.attributes.get("origin"); }
 
-	public String getAttribute(String attr) {
-		return (String) this.attributes.get(attr); }
+	/** 
+`	 * Convenience method to get the "origin" attribute in the attributes map.
+	 * 
+	 * @return String or null
+	 */
+	public Object getOrigin() {
+		return getAttribute("origin"); }
+
+	/**
+	 * Return the value of a key in the attributes map. 
+	 * 
+	 * @param attr The attribute to find
+	 * @return String or null
+	 */
+	public Object getAttribute(String attr) {
+		return this.attributes.get(attr); }
 	
 	@Override
 	public String toString() {
@@ -33,8 +55,7 @@ public class Category {
 		sb.append("<").append(this.tagName);
 		for (Object key : this.attributes.keySet()) {
 			Object val = this.attributes.get(key);
-			sb.append(String.format(" %s:%s", key, val));
-		}
+			sb.append(String.format(" %s:%s", key, val)); }
 		sb.append(">");
 		return sb.toString();
 	}

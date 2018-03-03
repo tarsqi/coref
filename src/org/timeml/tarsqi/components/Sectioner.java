@@ -1,5 +1,7 @@
 package org.timeml.tarsqi.components;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,6 +14,11 @@ public class Sectioner {
 	static String LINE = "Line";
 	static String LISTING = "Listing";
 	static String HEADER = "Header";
+
+	static int MAX_SHORT_SENTENCE_LENGTH = 50;
+	static int MIN_ALL_CAPPS_LENGTH = 5;
+
+	static Pattern HEADER_PATTERN = Pattern.compile("^[A-Z ]+");
 	
 	TarsqiDocument doc;
 	List<DocElement> lines;
@@ -24,28 +31,31 @@ public class Sectioner {
 	}
 	
 	/**
-	 * Take the text content of the TarsqiDocument and create simple document 
+	 * Take the text content of a TarsqiDocument and create simple document 
 	 * structure. 
 	 * 
-	 * Document structure now means adding paragraph and section markers. Any 
-	 * white-line separated sub text will be considered a paragraph. In addition,
-	 * some very short lines will be made into separate elements although it is
-	 * not yet clear what to name them. This includes enumerations. Very short
-	 * paragraphs may be named headers. And we may also split off beginnings of
-	 * lines that are all caps.
+	 * Document structure now means adding Paragraph, Header, Line and Listing
+	 * markers. Initially, any white-line separated sub text will be considered a
+	 * paragraph. Then paragraphs are inspected with some simple heuristics to
+	 * decide whether a paragraph is a header or a listing. In addition, some
+	 * paragraphs start with a section header and these headers are split off.
 	 */
 	public void parse() {
 
 		splitLines();
 		createParagraphs();
 		processParagraphs();
-		print();
+		//print();
 	}
 
+	public List<DocElement> getLines() {
+		return this.lines;	
+	}
+	
 	/**
 	 * Split the text content into a list of lines.
 	 */
-	private void splitLines() {
+	public void splitLines() {
 		StringBuilder sb;
 		sb = new StringBuilder();
 		int start = 0;
@@ -88,7 +98,7 @@ public class Sectioner {
 	 * Check whether paragraphs can be split and determine whether the paragraph 
 	 * is of a special type.
 	 * 
-	 * This is where all the interesting stuff happens, but at the moment there is 
+	 * This is where all the interesting stuff starts, but at the moment there is 
 	 * not that much of it.
 	 */
 	private void processParagraphs() {
@@ -111,126 +121,22 @@ public class Sectioner {
 			this.paras.add(element);
 	}
 	
-	private void print() {
-		System.out.println();
-		for (DocElement line : this.lines)
-			System.out.println(line);
+	public void prettyPrint() {
+		//System.out.println();
+		//for (DocElement line : this.lines)
+		//	System.out.println(line);
 		System.out.println();
 		for (DocElement para : this.paras)
-			para.pp("");
+			para.prettyPrint(System.out);
 		System.out.println();
 	}
+	
+	public void write(String filename) throws FileNotFoundException {
+		PrintStream ps = new PrintStream(filename);
+		for (DocElement para : this.paras)
+			para.prettyPrint(ps);
+	}
 
 }
 
 
-class DocElement {
-
-	static int MAX_SHORT_SENTENCE_LENGTH = 50;
-
-	static Pattern HEADER_PATTERN = Pattern.compile("^[A-Z ]+( |\\.)");
-
-	public int start, end;
-	String type, text, prefix;
-	List<DocElement> dtrs;
-
-	DocElement(String type, int start, int end) {
-		init(type, start, end);
-	}
-
-	DocElement(String type, int start, int end, String text) {
-		init(type, start, end);
-		this.text = text;
-	}
-
-	final void init(String type, int start, int end) {
-		this.type = type;
-		this.start = start;
-		this.end = end;
-		this.dtrs = new ArrayList<>();
-		this.prefix = null;
-	}
-	
-	boolean isEmpty() {
-		return this.start == this.end;
-	}
-	
-	/** 
-	 * Determine whether the element is a header.
-	 * 
-	 * @return True if the paragraph has one line only and this line looks like
-	 * a header, which currently means that the length of the line is checked.
-	 */
-	boolean isHeader() {
-		return this.dtrs.size() == 1 
-				&& this.end - this.start < MAX_SHORT_SENTENCE_LENGTH;
-	}
-	
-	boolean isListing() {
-		if (this.dtrs.size() == 1)
-			return false;
-		for (DocElement line : this.dtrs) {
-			if (line.text.length() > 30)
-				return false;
-		}
-		return true;
-	}
-
-	/** 
-	 * Determines whether the element starts with what looks like a section header.
-	 * 
-	 * Only looks at the first line of the element.
-	 */
-	boolean hasAllCapsPrefix() {
-		String firstLine = this.dtrs.get(0).text;
-		Matcher matcher = DocElement.HEADER_PATTERN.matcher(firstLine);
-		if (matcher.find()) {
-			this.prefix = matcher.group();
-			return true;
-		}
-		return false;
-	}
-
-	void splitOnPrefix() {
-		int p1 = this.start;
-		int p2 = this.start + this.prefix.length();
-		int p3 = this.end;
-		DocElement firstLine = this.dtrs.get(0);
-		DocElement element1 = new DocElement(Sectioner.HEADER, p1, p2);
-		DocElement element2 = new DocElement(Sectioner.PARAGRAPH, p2, p3);
-		// the first new element is a header, set its text to the prefix and
-		// clean out the prefix, since it has no sub structure we do not add dtrs
-		element1.text = this.prefix;
-		this.prefix = null;
-		// add lines to the second new element, the first line is special in that it
-		// needs to be altered
-		String newFirstLineText = firstLine.text.substring(element1.text.length());
-		element2.dtrs.add(
-			new DocElement(Sectioner.LINE, p2, firstLine.end, newFirstLineText));
-		for (int i = 1; i < this.dtrs.size(); i++)
-			element2.dtrs.add(
-				this.dtrs.get(i));
-		// replace the existing dtrs with the two new elements
-		this.dtrs = new ArrayList<>();
-		this.dtrs.add(element1);
-		this.dtrs.add(element2);
-	}
-
-	
-	@Override
-	public String toString() {
-		String textString = "";
-		if (this.text != null)
-			textString = " '" + this.text + "'";
-		return String.format("<%s %d:%d%s>", 
-				this.type, this.start, this.end, textString);
-	}
-
-	
-	void pp(String indentation) {
-		System.out.println(indentation + this);
-		for (DocElement dtr : this.dtrs)
-			dtr.pp(indentation + "   ");
-	}
-	
-}

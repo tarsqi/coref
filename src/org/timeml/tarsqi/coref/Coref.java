@@ -18,7 +18,7 @@ public class Coref {
 
 	public static void main(String[] args) {
 		
-		TarsqiDocument doc = new TarsqiReader().read(INPUT);
+		TarsqiDocument doc = new TarsqiReader().readTarsqiFile(INPUT);
 		doc.prettyPrint();
 		runStanford(doc.text);
 		

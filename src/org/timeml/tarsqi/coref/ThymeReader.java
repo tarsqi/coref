@@ -37,8 +37,8 @@ public class ThymeReader {
 	/**
 	 * Read the contents of a Thyme file.
 	 * 
-	 * @param file
-	 * @return 
+	 * @param file The file to be read
+	 * @return The contents of the file as a string
 	 */
     public static String readContents(File file) {
         String contents = null;
@@ -51,7 +51,7 @@ public class ThymeReader {
             System.out.println(e);
         } catch (IOException e) {
             System.out.println(e);
-        }     
+        }
         return contents;
     }
     
