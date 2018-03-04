@@ -34,6 +34,8 @@ public class TarsqiReader {
 	static final String[] 
 		LINK_NODES = {"ALINK", "SLINK", "TLINK" };
 	
+	TarsqiDocument document;
+	
 	/**
 	 * Reads a file and creates a TarsqiDocument. The entire file content is
 	 * put as is in the TarsqiDocument text instance variable.
@@ -44,10 +46,10 @@ public class TarsqiReader {
 	 */
 	public TarsqiDocument readTextFile(String filename) throws FileNotFoundException {
 		File file = new File(filename);
-		TarsqiDocument document = new TarsqiDocument(file.getPath());
+		this.document = new TarsqiDocument(file.getPath());
 		String content = new Scanner(file).useDelimiter("\\A").next();
-		document.addText(content);
-		return document;
+		this.document.setText(content);
+		return this.document;
 	}
 
 	/**
@@ -59,7 +61,7 @@ public class TarsqiReader {
 	public TarsqiDocument readTarsqiFile(String filename) {
 		
 		File file = new File(filename);
-		TarsqiDocument document = new TarsqiDocument(file.getPath());
+		this.document = new TarsqiDocument(file.getPath());
 		
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -67,56 +69,62 @@ public class TarsqiReader {
 			Document doc = db.parse(file);
 			Element ttk = doc.getDocumentElement();
 			ttk.normalize();
-
-			NodeList children = ttk.getChildNodes();
 			Node text = ttk.getElementsByTagName("text").item(0);
-			document.addText(text.getFirstChild().getNodeValue());
-			// these should be added to their own layer
-			Node source_tags = ttk.getElementsByTagName("source_tags").item(0);
-			Node tarsqi_tags = ttk.getElementsByTagName("tarsqi_tags").item(0);
-			NodeList tags = tarsqi_tags.getChildNodes();
-			
-			for (int i = 0; i < tags.getLength(); i++) {
-				Node n = tags.item(i);
-				String tagName = n.getNodeName();
-				if (n.getNodeType() != Node.ELEMENT_NODE) continue;
-				if (nodeIsEntity(tagName))
-					addEntity(document, n, tagName);
-				else if (nodeIsLink(tagName))
-					addLink(document, n, tagName);
-			}
-
-		} catch (SAXException ex) {
-			Logger.getLogger(TarsqiReader.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IOException ex) {
-			Logger.getLogger(TarsqiReader.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (ParserConfigurationException ex) {
+			this.document.setText(text.getFirstChild().getNodeValue());
+			readSourceTags(ttk);
+			readTarsqiTags(ttk);
+		} catch (SAXException | IOException | ParserConfigurationException ex) {
 			Logger.getLogger(TarsqiReader.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		return document;
 	}
 
-	private void addEntity(TarsqiDocument document, Node n, String tagName) {
-		if (tagName.equals("EVENT")) {
-			Event e = new Event(n);
-			document.addEvent(e);
-		} else if (tagName.equals("TIMEX3")) {
-			Timex t = new Timex(n);
-			document.addTimex(t);
+	private void readSourceTags(Element ttk) {
+		// these should be added to their own layer
+		Node source_tags = ttk.getElementsByTagName("source_tags").item(0);
+		NodeList tags = source_tags.getChildNodes();
+		for (int i = 0; i < tags.getLength(); i++) {
+			Node n = tags.item(i);
+			String tagName = n.getNodeName();
+		}
+	}
+	
+	private void readTarsqiTags(Element ttk) {
+		Node tarsqi_tags = ttk.getElementsByTagName("tarsqi_tags").item(0);
+		NodeList tags = tarsqi_tags.getChildNodes();
+		for (int i = 0; i < tags.getLength(); i++) {
+			Node n = tags.item(i);
+			String tagName = n.getNodeName();
+			if (n.getNodeType() != Node.ELEMENT_NODE) continue;
+			if (nodeIsEntity(tagName))
+				addEntity(n, tagName);
+			else if (nodeIsLink(tagName))
+				addLink(n, tagName);
 		}
 	}
 
-	private void addLink(TarsqiDocument document, Node n, String tagName) {
+
+	private void addEntity(Node n, String tagName) {
+		if (tagName.equals("EVENT")) {
+			Event e = new Event(n);
+			this.document.addEvent(e);
+		} else if (tagName.equals("TIMEX3")) {
+			Timex t = new Timex(n);
+			this.document.addTimex(t);
+		}
+	}
+
+	private void addLink(Node n, String tagName) {
 		if (tagName.equals("ALINK")) {
 			ALink al = new ALink(n);
-			document.addALink(al);
+			this.document.addALink(al);
 		} else if (tagName.equals("SLINK")) {
 			SLink sl = new SLink(n);
-			document.addSLink(sl);
+			this.document.addSLink(sl);
 		} else if (tagName.equals("TLINK")) {
 			TLink tl = new TLink(n);
-			document.addTLink(tl);
+			this.document.addTLink(tl);
 		}
 	}
 	

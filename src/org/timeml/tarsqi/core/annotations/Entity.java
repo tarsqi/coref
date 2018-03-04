@@ -7,7 +7,10 @@ public class Entity extends Annotation {
 	public Entity(Node node) {
 		super(node); }
 		
-	public int getBegin() { return (int) this.attributes.get("begin"); }
-	public int getEnd() { return (int) this.attributes.get("end"); }
+	public int getBegin() { 
+		return Integer.parseInt(this.getAttribute("begin")); }
+
+	public int getEnd() {
+		return Integer.parseInt(this.getAttribute("end")); }
 
 }

@@ -5,11 +5,24 @@ import org.w3c.dom.Node;
 public class TLink extends Link {
 	
 	public TLink(Node node) {
-		super(node); }
+		super(node);
+		generateAttributes();
+	}
 	
-	public String getTimeID() { return (String) this.attributes.get("timeID"); }
-	public String getEventInstanceID() { return (String) this.attributes.get("eventInstanceID"); }
-	public String getRelatedToTime() { return (String) this.attributes.get("relatedToTime"); }
-	public String getRelatedToEventInstance() { return (String) this.attributes.get("relatedToEventInstance"); }
+	final void generateAttributes() {
+		this.lid = getLID();
+		this.relType = getRelType();
+		if (this.attributes.containsKey(EVENT_INSTANCE_ID))
+			this.eventInstanceID = getEventInstanceID();
+		if (this.attributes.containsKey(RELATED_TO_EVENT_INSTANCE))
+			this.relatedToEventInstance = getRelatedToEventInstance();
+		if (this.attributes.containsKey(TIME_ID))
+			this.timeID = getTimeID();
+		if (this.attributes.containsKey(RELATED_TO_TIME))
+			this.relatedToTime = getRelatedToTime();
+		this.origin = getOrigin();
+		this.syntax = getSyntax();
+
+	}
 
 }

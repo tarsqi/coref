@@ -30,7 +30,7 @@ public class TarsqiDocument {
 	public boolean isValid() {
 		return this.text != null; }
 	
-	public void addText(String text) { this.text = text; }
+	public void setText(String text) { this.text = text; }
 	public void addEvent(Event e) { this.events.add(e); }
 	public void addTimex(Timex t) { this.timexes.add(t); }
 	public void addALink(ALink l) { this.alinks.add(l); }

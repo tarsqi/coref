@@ -4,57 +4,51 @@ import java.util.ArrayList;
 import java.util.List;
 import org.w3c.dom.Node;
 
-public class Event extends Entity {
+public class Event extends TimemlAnnotation {
 	
-	public static final String EID = "eid";
-	public static final String EIID = "eiid";
-	public static final String CLASS = "class";
-	public static final String TENSE = "tense";
-	public static final String ASPECT = "aspect";
-	
-	public String tense, aspect;
+	public String eid, eiid, eclass, pos, epos;
+	public String tense, aspect, polarity, modality;
 	
 	public Event(Node node) {
 		super(node); 
-		// TODO: hmmm, not sure how to deal with all these regular TimeML 
-		// attributes, it would be nice to just have an annotation object much
-		// like the one in LIF, but we would probably also enjoy specialized
-		// behavior for some types. If we have a variable like this.tense,
-		// should it then be private (and save) or public (and easy to access)? 
 		generateAttributes();
 	}
 
 	final void generateAttributes() {
-		this.tense = generateTenseValue();
-		this.aspect = generateAspectValue();
+		this.begin = getBegin();
+		this.end = getEnd();
+		this.eid = getEID();
+		this.eiid = getEIID();
+		this.eclass = getEClass();
+		this.pos = getPOS();
+		this.epos = getEPOS();
+		this.tense = getTense();
+		this.aspect = getAspect();
+		this.polarity = getPolarity();
+		this.modality = getModality();
+		this.origin = getOrigin();
 	}
-	
-	private String generateTenseValue() {
-		return (String) this.attributes.getOrDefault(TENSE, "NONE"); }
-
-	private String generateAspectValue() {
-		return (String) this.attributes.getOrDefault(ASPECT, "NONE"); }
 
 	public boolean checkAttributes() {
+		// NOTE. With the attributes map plus the added top-level fields there is
+		// some redundancy. In addition, while the map is protected any outsider
+		// could change the other top-level field. This method compares the two
+		// sets of attributes.
 		List<Object[]> attrs = new ArrayList();
-		attrs.add( new Object[] {this.tense, generateTenseValue()} );
-		attrs.add( new Object[] {this.aspect, generateAspectValue()} );
+		attrs.add( new Object[] {this.begin, getBegin()} );
+		attrs.add( new Object[] {this.end, getEnd()} );
+		attrs.add( new Object[] {this.eid, getEID()} );
+		attrs.add( new Object[] {this.eiid, getEIID()} );
+		attrs.add( new Object[] {this.eclass, getEClass()} );
+		attrs.add( new Object[] {this.pos, getPOS()} );
+		attrs.add( new Object[] {this.epos, getEPOS()} );
+		attrs.add( new Object[] {this.tense, getTense()} );
+		attrs.add( new Object[] {this.aspect, getAspect()} );
+		attrs.add( new Object[] {this.polarity, getPolarity()} );
+		attrs.add( new Object[] {this.modality, getModality()} );
 		for (Object[] pair : attrs) {
 			if (pair[0] != pair[1]) return false; }
 		return true;
 	}
-
-
-	public String getEID() { return (String) this.attributes.get("eid"); }
-	public String getEIID() { return (String) this.attributes.get("eiid"); }
-	public String getPos() { return (String) this.attributes.get("pos"); }
-	public String getEpos() { return (String) this.attributes.get("epos"); }
-	public String getForm() { return (String) this.attributes.get("form"); }
-	//public String getTense() { return (String) this.attributes.getOrDefault("tense", "NONE"); }
-	public String getAspect() { return (String) this.attributes.get("aspect"); }
-	public String getEventClass() { return (String) this.attributes.get("class"); }
-
-	// 
-	public String getTense() { return this.tense; }
 	
 }

@@ -162,8 +162,8 @@ public class Tarsqi {
 	}
 
 	/**
-	 * Analysis method to find all instances of all caps words at the 
-	 * beginning of a line.
+	 * Analysis method to find all instances of all sequences of all caps words 
+	 * at the beginning of a line.
 	 */
 	private static void findAllCapsInThyme() {
 		// Loop through all Thyme files in the train directory and collect all
@@ -203,6 +203,7 @@ public class Tarsqi {
 
 	/**
 	 * Return a sorted list of file names in a directory.
+	 * 
 	 * @param dirname The name of the directory
 	 * @return An array of filenames, not including the path.
 	 */
@@ -220,6 +221,7 @@ public class Tarsqi {
 		String tarsqiFile = "src/resources/test.ttk";
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
 		tarsqiDoc.prettyPrint();
+		System.out.println(tarsqiDoc.tlinks.get(0).relType);
 	}
 
 }

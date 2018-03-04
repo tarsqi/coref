@@ -1,15 +1,20 @@
 package org.timeml.tarsqi.core.annotations;
 
-import org.timeml.tarsqi.core.annotations.Entity;
 import org.w3c.dom.Node;
 
-public class Timex extends Entity {
+public class Timex extends TimemlAnnotation {
+	
+	public String tid, type, value, functionInDocument;
 	
 	public Timex(Node node) {
-		super(node); }
+		super(node); 
+		generateAttributes();
+	}
 
-	public String getTID() { return (String) this.attributes.get("tid"); }
-	public String getType() { return (String) this.attributes.get("type"); }
-	public String getValue() { return (String) this.attributes.get("value"); }
-
+	final void generateAttributes() {
+		this.tid = getTID();
+		this.type = getType(); 
+		this.value = getValue();
+		this.functionInDocument = getFunctionInDocument();
+	}
 }
