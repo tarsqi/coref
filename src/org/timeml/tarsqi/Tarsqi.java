@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -221,7 +222,6 @@ public class Tarsqi {
 		String tarsqiFile = "src/resources/test.ttk";
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
 		tarsqiDoc.prettyPrint();
-		System.out.println(tarsqiDoc.tlinks.get(0).relType);
 	}
 
 }

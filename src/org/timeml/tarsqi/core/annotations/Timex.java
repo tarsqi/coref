@@ -17,4 +17,8 @@ public class Timex extends TimemlAnnotation {
 		this.value = getValue();
 		this.functionInDocument = getFunctionInDocument();
 	}
+
+	@Override
+	public boolean isTimex() { return true; }
+
 }

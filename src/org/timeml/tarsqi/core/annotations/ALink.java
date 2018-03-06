@@ -18,4 +18,7 @@ public class ALink extends Link {
 		this.syntax = getSyntax();
 	}
 	
+	@Override
+	public boolean isALink() { return true; }
+
 }

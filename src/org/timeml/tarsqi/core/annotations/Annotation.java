@@ -69,12 +69,22 @@ public class Annotation {
 	public String getAttribute(String attr) {
 		return this.attributes.get(attr); }
 	
+	public boolean isEvent() { return false; }
+
+	public boolean isTimex() { return false; }
+
+	public boolean isALink() { return false; }
+
+	public boolean isSLink() { return false; }
+
+	public boolean isTLink() { return false; }
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<").append(this.type);
-		for (Object key : this.attributes.keySet()) {
-			Object val = this.attributes.get(key);
+		for (String key : this.attributes.keySet()) {
+			String val = this.attributes.get(key);
 			sb.append(String.format(" %s:%s", key, val)); }
 		sb.append(">");
 		return sb.toString();

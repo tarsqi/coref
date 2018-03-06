@@ -1,7 +1,10 @@
 package org.timeml.tarsqi.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.timeml.tarsqi.core.annotations.ALink;
+import org.timeml.tarsqi.core.annotations.Annotation;
 import org.timeml.tarsqi.core.annotations.Event;
 import org.timeml.tarsqi.core.annotations.SLink;
 import org.timeml.tarsqi.core.annotations.TLink;
@@ -17,6 +20,7 @@ public class TarsqiDocument {
 	public ArrayList<SLink> slinks;
 	public ArrayList<TLink> tlinks;
 	public ArrayList<AnnotationLayer> layers;
+	public Map<String, AnnotationLayer> layerIdx;
 	
 	public TarsqiDocument(String filename) {
 		this.filename = filename;
@@ -25,7 +29,13 @@ public class TarsqiDocument {
 		this.alinks = new ArrayList<>();
 		this.slinks = new ArrayList<>();
 		this.tlinks = new ArrayList<>();
-		this.layers = new ArrayList<>(); }
+		this.layers = new ArrayList<>();
+		this.layerIdx = new HashMap<>();
+	}
+	
+	public AnnotationLayer getTarsqiLayer() {
+		return this.layerIdx.get("TARSQI_TAGS");
+	}
 	
 	public boolean isValid() {
 		return this.text != null; }
@@ -37,9 +47,35 @@ public class TarsqiDocument {
 	public void addSLink(SLink l) { this.slinks.add(l); }
 	public void addTLink(TLink l) { this.tlinks.add(l); }
 
+	public void addLayer(AnnotationLayer layer) {
+		this.layers.add(layer);
+		this.layerIdx.put(layer.source, layer);
+	}
+
+	/**
+	 * Take all Tarsqi tags and put them in the easy access lists on the top level.
+	 */
+	public void promoteTarsqiTags() {
+		for (Annotation annotation : getTarsqiLayer().getAnnotations()) {
+			if (annotation.isEvent())
+				this.events.add((Event) annotation);
+			else if (annotation.isTimex())
+				this.timexes.add((Timex) annotation);
+			else if (annotation.isALink())
+				this.alinks.add((ALink) annotation);
+			else if (annotation.isSLink())
+				this.slinks.add((SLink) annotation);
+			else if (annotation.isTLink())
+				this.tlinks.add((TLink) annotation);
+
+		}
+	}
+
 	public void prettyPrint() {
 		System.out.println(String.format("<TarsqiDocument '%s'>", this.filename));
 		int max = 3;
+		for (AnnotationLayer layer : this.layers) {
+			System.out.println("   " + layer); }
 		for (int i = 0 ; i < this.events.size() && i < max ; i++)
 			System.out.println("   " + this.events.get(i));
 		for (int i = 0 ; i < this.timexes.size() && i < max ; i++)
@@ -51,4 +87,5 @@ public class TarsqiDocument {
 		for (int i = 0 ; i < this.tlinks.size() && i < max ; i++)
 			System.out.println("   " + this.tlinks.get(i));
 	}
+
 }

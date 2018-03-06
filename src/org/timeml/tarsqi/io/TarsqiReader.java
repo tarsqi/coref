@@ -3,18 +3,18 @@ package org.timeml.tarsqi.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.timeml.tarsqi.core.TarsqiDocument;
-import org.timeml.tarsqi.core.annotations.ALink;
-import org.timeml.tarsqi.core.annotations.Event;
-import org.timeml.tarsqi.core.annotations.SLink;
-import org.timeml.tarsqi.core.annotations.TLink;
-import org.timeml.tarsqi.core.annotations.Timex;
+import org.timeml.tarsqi.core.AnnotationLayer;
+import org.timeml.tarsqi.core.annotations.Annotation;
+import org.timeml.tarsqi.core.annotations.AnnotationFactory;
 import org.w3c.dom.Document;	
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,18 +22,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * The sole tasks of this class is to take a filename and create an instance if
+ * The sole tasks of this class is to take a filename and create an instance of
  * TarsqiDocument. It has public static methods for two kinds of input files:
  * regular text files and files in the Tarsqi TTK format.
  */
 public class TarsqiReader {
 
-	static final String[] 
-		ENTITY_NODES = {"EVENT", "TIMEX3", "lex", "s", "ng", "vb", "docelement"};
-
-	static final String[] 
-		LINK_NODES = {"ALINK", "SLINK", "TLINK" };
-	
 	TarsqiDocument document;
 	
 	/**
@@ -59,7 +53,7 @@ public class TarsqiReader {
 	 * @return TarsqiDocument
 	 */
 	public TarsqiDocument readTarsqiFile(String filename) {
-		
+
 		File file = new File(filename);
 		this.document = new TarsqiDocument(file.getPath());
 		
@@ -80,65 +74,62 @@ public class TarsqiReader {
 		return document;
 	}
 
+	/**
+	 * Read the tags in the source_tags tag and add them to the TarsqiDocument.
+	 * 
+	 * The source of the new layer will be SOURCE_TAGS.
+	 * 
+	 * @param ttk the top-level element of the ttk document
+	 */
 	private void readSourceTags(Element ttk) {
-		// these should be added to their own layer
-		Node source_tags = ttk.getElementsByTagName("source_tags").item(0);
-		NodeList tags = source_tags.getChildNodes();
-		for (int i = 0; i < tags.getLength(); i++) {
-			Node n = tags.item(i);
-			String tagName = n.getNodeName();
+		ArrayList<Node> source_tags = getSubElements(ttk, "source_tags");
+		AnnotationLayer layer = new AnnotationLayer("SOURCE_TAGS");
+		this.document.addLayer(layer);
+		for (Node n : source_tags) {
+			Annotation annotation = new Annotation(n);
+			layer.addAnnotation(annotation);
 		}
 	}
 	
+	/**
+	 * Read the tags in the tarsqi_tags tag and add them to the TarsqiDocument.
+	 * 
+	 * The source of the new layer will be TARSQI_TAGS.
+	 * 
+	 * @param ttk the top-level element of the ttk document
+	 */
 	private void readTarsqiTags(Element ttk) {
-		Node tarsqi_tags = ttk.getElementsByTagName("tarsqi_tags").item(0);
-		NodeList tags = tarsqi_tags.getChildNodes();
+		ArrayList<Node> tarsqi_tags = getSubElements(ttk, "tarsqi_tags");
+		AnnotationLayer layer = new AnnotationLayer("TARSQI_TAGS");
+		this.document.addLayer(layer);
+		for (Node n : tarsqi_tags) {
+			Annotation annotation = AnnotationFactory.createAnnotation(n);
+			// TODO: maybe print warning if annotation is null
+			if (annotation != null)
+				layer.addAnnotation(annotation);
+		}
+		this.document.promoteTarsqiTags();
+	}
+
+	/**
+	 * Utility method to get the elements that are immediate children of the
+	 * element identified by a tag name.
+	 * 
+	 * @param top the element in which you search for the element that you want
+	 * the children of
+	 * @param tagName the element that you want the children of
+	 * @return an ArrayList of Node instances
+	 */
+	private static ArrayList<Node> getSubElements(Element top, String tagName) {
+		ArrayList<Node> result = new ArrayList<>();
+		Node n = top.getElementsByTagName(tagName).item(0);
+		NodeList tags = n.getChildNodes();
 		for (int i = 0; i < tags.getLength(); i++) {
-			Node n = tags.item(i);
-			String tagName = n.getNodeName();
-			if (n.getNodeType() != Node.ELEMENT_NODE) continue;
-			if (nodeIsEntity(tagName))
-				addEntity(n, tagName);
-			else if (nodeIsLink(tagName))
-				addLink(n, tagName);
+			Node sub = tags.item(i);
+			if (sub.getNodeType() == Node.ELEMENT_NODE)
+				result.add(sub);
 		}
-	}
-
-
-	private void addEntity(Node n, String tagName) {
-		if (tagName.equals("EVENT")) {
-			Event e = new Event(n);
-			this.document.addEvent(e);
-		} else if (tagName.equals("TIMEX3")) {
-			Timex t = new Timex(n);
-			this.document.addTimex(t);
-		}
-	}
-
-	private void addLink(Node n, String tagName) {
-		if (tagName.equals("ALINK")) {
-			ALink al = new ALink(n);
-			this.document.addALink(al);
-		} else if (tagName.equals("SLINK")) {
-			SLink sl = new SLink(n);
-			this.document.addSLink(sl);
-		} else if (tagName.equals("TLINK")) {
-			TLink tl = new TLink(n);
-			this.document.addTLink(tl);
-		}
-	}
-	
-	private boolean nodeIsEntity(String nodeName) {
-		return nodeIsOneOf(nodeName, ENTITY_NODES); }
-
-	private boolean nodeIsLink(String nodeName) {
-		return nodeIsOneOf(nodeName, LINK_NODES); }
-
-	private boolean nodeIsOneOf(String nodeName, String[] nodeNames) {
-		// For small arrays, this is claimed to be more eficient than using a set
-		for(String s: nodeNames){
-			if(s.equals(nodeName)) return true; }
-		return false;
+		return result;
 	}
 
 }

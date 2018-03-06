@@ -1,5 +1,9 @@
 package org.timeml.tarsqi.core.annotations;
 
+import static org.timeml.tarsqi.definitions.TimeML.EVENT_INSTANCE_ID;
+import static org.timeml.tarsqi.definitions.TimeML.RELATED_TO_EVENT_INSTANCE;
+import static org.timeml.tarsqi.definitions.TimeML.RELATED_TO_TIME;
+import static org.timeml.tarsqi.definitions.TimeML.TIME_ID;
 import org.w3c.dom.Node;
 
 public class TLink extends Link {
@@ -25,4 +29,6 @@ public class TLink extends Link {
 
 	}
 
+	@Override
+	public boolean isTLink() { return true; }
 }

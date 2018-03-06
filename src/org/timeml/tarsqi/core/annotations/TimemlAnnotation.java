@@ -1,5 +1,6 @@
 package org.timeml.tarsqi.core.annotations;
 
+import static org.timeml.tarsqi.definitions.TimeML.*;
 import org.w3c.dom.Node;
 
 /**
@@ -22,34 +23,6 @@ import org.w3c.dom.Node;
  */
 public class TimemlAnnotation extends Annotation {
 	
-	public static final String BEGIN = "begin";
-	public static final String END = "end";
-	public static final String ORIGIN = "origin";
-
-	public static final String TID = "tid";
-	public static final String TYPE = "type";
-	public static final String VALUE = "value";
-	public static final String FUNCTION_IN_DOCUMENT = "functionInDocument";
-	
-	public static final String EID = "eid";
-	public static final String EIID = "eiid";
-	public static final String CLASS = "class";
-	public static final String POS = "pos";
-	public static final String EPOS = "epos";
-	public static final String TENSE = "tense";
-	public static final String ASPECT = "aspect";
-	public static final String POLARITY = "polarity";
-	public static final String MODALITY = "modality";
-
-	public static final String LID = "lid";
-	public static final String RELTYPE = "relType";
-	public static final String TIME_ID = "timeID";
-	public static final String RELATED_TO_TIME = "relatedToTime";
-	public static final String EVENT_INSTANCE_ID = "eventInstanceID";
-	public static final String RELATED_TO_EVENT_INSTANCE = "relatedToEventInstance";
-	public static final String SUBORDINATED_EVENT_INSTANCE = "subordinatedEventInstance";
-	public static final String SYNTAX = "syntax";
-
 	public int begin, end;
 	public String origin;
 	

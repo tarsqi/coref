@@ -18,5 +18,7 @@ public class SLink extends Link {
 		this.syntax = getSyntax();
 	}
 
+	@Override
+	public boolean isSLink() { return true; }
 
 }

@@ -51,4 +51,7 @@ public class Event extends TimemlAnnotation {
 		return true;
 	}
 	
+	@Override
+	public boolean isEvent() { return true; }
+	
 }
