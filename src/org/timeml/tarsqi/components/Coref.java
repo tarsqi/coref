@@ -7,6 +7,7 @@ import edu.stanford.nlp.pipeline.Annotation;
 import java.util.List;
 import org.timeml.tarsqi.core.TarsqiDocument;
 import org.timeml.tarsqi.io.TarsqiReader;
+import org.timeml.tarsqi.tools.stanford.StanfordResult;
 
 
 public class Coref {
@@ -38,8 +39,8 @@ public class Coref {
 	public static void runStanford(String input) {
 		System.out.println(input);
 		StanfordNLP stan = new StanfordNLP("depparse");
-		Annotation annotation = stan.processString(input);
-		stan.show(annotation);
+		StanfordResult result = stan.processString(input);
+		stan.show(result.annotation);
 		//Annotation doc = stan.document;
 		//System.out.println(doc);
 	}

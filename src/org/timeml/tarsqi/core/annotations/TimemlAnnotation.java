@@ -6,15 +6,15 @@ import org.w3c.dom.Node;
 /**
  * Class that defines the fields used by TimeML tags and that contains some
  * common methods.
- * 
+ *
  * What distinguishes this class and all its subclasses from the Annotation class
  * is that some of the attributes from the attributes map are copied to top-level
  * public instance variables with the correct type. Note that all values in the
  * attributes map are Strings so for all attributes that are exposed we need to
- * write methods that know what types are required. All subclasses should define 
+ * write methods that know what types are required. All subclasses should define
  * a generateAttributes() method that calls get methods for individual attributes
  * as appropriate and assign the return values to the corresponding fields.
- * 
+ *
  * TimeML attributes are defined in this class as well a bunch of attributes that
  * are not TimeML attributes, but that are attributes added by Tarsqi. It is not
  * necessary for all these attributes to be defined, we could have some of them
@@ -22,17 +22,17 @@ import org.w3c.dom.Node;
  * getters for easy access.
  */
 public class TimemlAnnotation extends Annotation {
-	
+
 	public int begin, end;
 	public String origin;
-	
+
 	public TimemlAnnotation(Node node) {
 		super(node);
 	}
 
 	// for all TimeML tags
-	
-	protected int getBegin() {
+
+    protected int getBegin() {
 		return getIntegerValue(BEGIN); }
 
 	protected int getEnd() {
@@ -42,21 +42,21 @@ public class TimemlAnnotation extends Annotation {
 		return getStringValue(ORIGIN, "NONE"); }
 
 	// TIMEX3 tags
-	
-	protected String getTID() { 
+
+	protected String getTID() {
 		return getStringValue(TID, "NONE"); }
-	
-	protected String getType() { 
+
+	protected String getType() {
 		return getStringValue(TYPE, "NONE"); }
-	
-	protected String getValue() { 
+
+	protected String getValue() {
 		return getStringValue(VALUE, "NONE"); }
 
-	protected String getFunctionInDocument() { 
+	protected String getFunctionInDocument() {
 		return getStringValue(FUNCTION_IN_DOCUMENT, "NONE"); }
-	
+
 	// EVENT tags
-	
+
 	protected String getEID() {
 		return getStringValue(EID, "NONE"); }
 
@@ -88,7 +88,7 @@ public class TimemlAnnotation extends Annotation {
 		return getStringValue(ASPECT, "NONE"); }
 
 	// ALINK, SLINK and TLINK tags
-	
+
 	protected String getLID() {
 		return getStringValue(LID, "NONE"); }
 
@@ -112,7 +112,7 @@ public class TimemlAnnotation extends Annotation {
 
 	protected String getRelatedToTime() {
 		return getStringValue(RELATED_TO_TIME, "NONE"); }
-	
+
 	/**
 	 * Return the value of the attribute as a string, using the default value
 	 * given if the attributes map does not contain the attribute.
@@ -128,6 +128,7 @@ public class TimemlAnnotation extends Annotation {
 		// an alternative would be to use "-1" as a default, but that would
 		// only work for begin and end and not for other attributes; another
 		// option might be for this method to return null for those cases
-		return Integer.parseInt(this.attributes.get(attr)); }
+//		return Integer.parseInt(this.attributes.get(attr)); }
+		return Integer.parseInt(this.attributes.get(attr).toString()); }
 
 }

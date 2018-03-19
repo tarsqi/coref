@@ -1,21 +1,23 @@
 package org.timeml.tarsqi;
 
-import edu.stanford.nlp.pipeline.Annotation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.timeml.tarsqi.components.DocElement;
 import org.timeml.tarsqi.components.Sectioner;
+import org.timeml.tarsqi.core.AnnotationLayer;
 import org.timeml.tarsqi.core.TarsqiDocument;
+import org.timeml.tarsqi.core.annotations.TreeAnnotation;
+import static org.timeml.tarsqi.definitions.Components.SECTIONER;
 import org.timeml.tarsqi.io.TarsqiReader;
 import org.timeml.tarsqi.tools.stanford.StanfordDocument;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
+import org.timeml.tarsqi.tools.stanford.StanfordResult;
 
 public class Tarsqi {
 
@@ -31,8 +33,9 @@ public class Tarsqi {
 	public static boolean runSectionerOnSectionerFile = false;
 	public static boolean runSectionerOnThyme = false;
 	public static boolean findAllCapsInThyme = false;
-	public static boolean loadTarsqiDocument = true;
-			
+	public static boolean loadTarsqiDocument = false;
+	public static boolean runTarsqiPipeline = true;
+
 	public static void main(String[] args) {
 
 		if (runStanfordOnThymeFiles) runStanfordOnThymeFiles();
@@ -43,26 +46,27 @@ public class Tarsqi {
 		if (runSectionerOnThyme) runSectionerOnThyme();
 		if (findAllCapsInThyme) findAllCapsInThyme();
 		if (loadTarsqiDocument) loadTarsqiDocument();
+		if (runTarsqiPipeline) runTarsqiPipeline("src/resources/tiny.ttk");
 	}
 
 	/**
 	 * Run StanfordNLP on a couple of example thyme file that were processed
 	 * by TTK.
-	 */ 
+	 */
 	static void runStanfordOnThymeFiles() {
 		String input_dir = THYME_CORPUS + "train/ttk-output/";
 		String output_dir = THYME_CORPUS + "train/stanford-output/";
 		// TODO: the last of these throws an XML error that needs to be resolved.
-		String[] reports = { 
+		String[] reports = {
 			"ID001_clinic_001", "ID001_clinic_003", "ID009_clinic_025",
 			"doc0003_CLIN" };
-		for (int i = 0 ; i < reports.length ; i++)
-			runStanfordOnFile(input_dir + reports[i], output_dir + reports[i]);
+		for (String report : reports)
+			runStanfordOnFile(input_dir + report, output_dir + report);
 	}
-	
+
 	/**
 	 * Run the Stanford pipeline on a TTK file.
-	 * 
+	 *
 	 * @param infile Name of the input file
 	 * @param outfile Name of the output file
 	 */
@@ -71,8 +75,8 @@ public class Tarsqi {
 		TarsqiDocument doc = new TarsqiReader().readTarsqiFile(infile);
 		if (doc.isValid()) {
 			StanfordNLP snlp = new StanfordNLP("depparse");
-			Annotation document = snlp.processString(doc.text);
-			snlp.export(doc.filename, document, outfile); }
+			StanfordResult result = snlp.processString(doc.text);
+			snlp.export(doc.filename, result, outfile); }
 	}
 
 	/**
@@ -93,14 +97,14 @@ public class Tarsqi {
 			TarsqiDocument doc = new TarsqiReader().readTarsqiFile(infile);
 			if (! doc.isValid()) continue;
 			try {
-				Annotation document = snlp.processString(doc.text);
-				snlp.export(infile, document, outfile);
+				StanfordResult result = snlp.processString(doc.text);
+				snlp.export(infile, result, outfile);
 			} catch (Exception ex) {
 				Logger.getLogger(StanfordNLP.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
-	
+
 	/**
 	 * Testing code to load TTK documents and Stanford output.
 	 */
@@ -124,7 +128,7 @@ public class Tarsqi {
 
 	/**
 	 * Run the sectioner on a file.
-	 * 
+	 *
 	 * @param filename Name of the input file
 	 */
 	private static void runSectioner(String filename) {
@@ -139,7 +143,7 @@ public class Tarsqi {
 	 * the loop after some number of iterations.
 	 */
 	private static void runSectionerOnThyme() {
- 
+
 		String thymeDir = THYME_SOURCE + "train/";
 		String[] files = getFiles(thymeDir);
 		String outDir = "build/out/";
@@ -163,7 +167,7 @@ public class Tarsqi {
 	}
 
 	/**
-	 * Analysis method to find all instances of all sequences of all caps words 
+	 * Analysis method to find all instances of all sequences of all caps words
 	 * at the beginning of a line.
 	 */
 	private static void findAllCapsInThyme() {
@@ -185,7 +189,7 @@ public class Tarsqi {
 				for (DocElement line : sectioner.getLines()) {
 					if (line.hasAllCapsPrefix()) {
 						String prefix = line.getPrefix();
-						if (caps.get(prefix) == null) 
+						if (caps.get(prefix) == null)
 							caps.put(prefix, new ArrayList<>());
 						caps.get(prefix).add(line);
 					}
@@ -204,7 +208,7 @@ public class Tarsqi {
 
 	/**
 	 * Return a sorted list of file names in a directory.
-	 * 
+	 *
 	 * @param dirname The name of the directory
 	 * @return An array of filenames, not including the path.
 	 */
@@ -222,6 +226,17 @@ public class Tarsqi {
 		String tarsqiFile = "src/resources/test.ttk";
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
 		tarsqiDoc.prettyPrint();
+	}
+
+	private static void runTarsqiPipeline(String filename) {
+		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(filename);
+		tarsqiDoc.runSectioner();
+		tarsqiDoc.runTagger();
+		tarsqiDoc.runChunker();
+		tarsqiDoc.prettyPrint();
+		AnnotationLayer layer = tarsqiDoc.getLayer(SECTIONER);
+		TreeAnnotation top = (TreeAnnotation) layer.annotations.get(0);
+		top.prettyPrint();
 	}
 
 }
