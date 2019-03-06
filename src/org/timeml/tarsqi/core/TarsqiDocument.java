@@ -10,8 +10,6 @@ import org.timeml.tarsqi.core.annotations.Event;
 import org.timeml.tarsqi.core.annotations.SLink;
 import org.timeml.tarsqi.core.annotations.TLink;
 import org.timeml.tarsqi.core.annotations.Timex;
-import org.timeml.tarsqi.core.annotations.TreeAnnotation;
-import static org.timeml.tarsqi.definitions.Components.SECTIONER;
 import static org.timeml.tarsqi.definitions.Components.STANFORD_TAGGER;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import org.timeml.tarsqi.tools.stanford.StanfordResult;

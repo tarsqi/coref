@@ -67,7 +67,7 @@ public class DocElement {
 	/**
 	 * Determine whether the element is a header.
 	 *
-	 * @return True if the paragraph has one line only and this line looks like
+	 * @return True if the DocElement has one line only and this line looks like
 	 * a header, which currently means that the length of the line is checked.
 	 */
 	boolean isHeader() {
@@ -76,6 +76,14 @@ public class DocElement {
 			&& this.end - this.start < Sectioner.MAX_SHORT_SENTENCE_LENGTH;
 	}
 
+	/**
+	 * Determine whether an element is a listing.
+	 *
+	 * Lists are defined as 2 or more lines, but with no line being longer than
+	 * 30 characters.
+	 *
+	 * @return True if the DocElement looks like a listing.
+	 */
 	boolean isListing() {
 		if (this.dtrs.size() == 1)
 			return false;
@@ -103,10 +111,8 @@ public class DocElement {
 			// the next character
 			this.prefix = matcher.group().trim();
 			int prefixLength = this.prefix.length();
-			if (
-					prefixLength >= Sectioner.MIN_ALL_CAPPS_LENGTH
-					&& hasBoundaryAt(prefixLength)
-				) {
+			if (prefixLength >= Sectioner.MIN_ALL_CAPPS_LENGTH
+				&& hasBoundaryAt(prefixLength)) {
 				return true;
 			}
 		}

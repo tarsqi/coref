@@ -40,10 +40,10 @@ import org.timeml.tarsqi.io.TarsqiReader;
 public class StanfordNLP {
 
 	public StanfordCoreNLP pipeline;
-	
+
 	MaxentTagger tagger;
 	ShiftReduceParser model;
-	
+
 	// these will be set to true by the annotators() method, which is given the
 	// list of components that should be applied
 	boolean ner = false;
@@ -51,14 +51,14 @@ public class StanfordNLP {
 	boolean depparse = false;
 	boolean coref = false;
 	boolean shiftreduce = false;
-	
+
 	String models = "edu/stanford/nlp/models/";
 	// Requires an extra download of stanford-srparser-2014-10-23-models.jar
 	String modelPath = models + "srparser/englishSR.ser.gz";
 	String taggerPath = models + "pos-tagger/english-left3words/english-left3words-distsim.tagger";
-	
+
 	public StanfordNLP(String components) {
-		// creates a StanfordCoreNLP object, with tokenizer, splitter, tagger and 
+		// creates a StanfordCoreNLP object, with tokenizer, splitter, tagger and
 		// lemmatizer, plus some others as defined by the components argument
 		//if (this.pipeline == null) {
 		//System.out.println(">>> Initializing pipeline...");
@@ -74,14 +74,14 @@ public class StanfordNLP {
 	private void loadModels() {
 		if (this.shiftreduce) {
 			this.tagger = new MaxentTagger(taggerPath);
-			this.model = ShiftReduceParser.loadModel(modelPath); }		
+			this.model = ShiftReduceParser.loadModel(modelPath); }
 	}
-	
+
 	/**
 	 * Run Stanford CoreNLP on a string.
-	 * 
-	 * @param input The input String 
-	 * @return A StanfordResult with all annotations from the pipeline and from 
+	 *
+	 * @param input The input String
+	 * @return A StanfordResult with all annotations from the pipeline and from
 	 * the shift-reduce parser
 	 */
 	public StanfordResult processString(String input) {
@@ -89,9 +89,9 @@ public class StanfordNLP {
 		Annotation annotation = new Annotation(input);
 		Tree tree = null;
 		this.pipeline.annotate(annotation);
-		// In addition, run the ShiftReduce parser if needed, the ShiftReduce 
+		// In addition, run the ShiftReduce parser if needed, the ShiftReduce
 		// cannot be run via the pipeline so we do it this way
-		// TODO: figure out if we can use the sentences, token and tags inside 
+		// TODO: figure out if we can use the sentences, token and tags inside
 		// the Annotation object so we do not tokenize and tag twice
 		if (this.shiftreduce) {
 			DocumentPreprocessor tokenizer;
@@ -107,7 +107,7 @@ public class StanfordNLP {
 
 	/**
 	 * Run Stanford CoreNLP on a file.
-	 * 
+	 *
 	 * @param input The input file
 	 * @return A StanfordResult or null if the file was not found.
 	 */
@@ -138,9 +138,9 @@ public class StanfordNLP {
 		for (File file : files) {
 			System.out.println(file);
 			this.processFile(file);
-		} 
+		}
 	}
-	
+
 	private String annotators(String components) {
 		Set<String> comps = new HashSet(Arrays.asList(components.split("\\s+")));
 		//List<String> x = new ArrayList<>();
@@ -157,14 +157,14 @@ public class StanfordNLP {
 			sb.append(", depparse"); }
 		if (comps.contains("coref")) {
 			this.coref = true;
-			sb.append(", coref"); }	
+			sb.append(", coref"); }
 		if (comps.contains("shiftreduce")) {
 			this.shiftreduce = true; }
 		return sb.toString();
 	}
 
 	public void show(Annotation document) {
-		
+
 		// CoreMap: a Map that uses class objects as keys and has values with custom types
 		// CoreLabel: a CoreMap with additional token-specific methods
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
@@ -179,7 +179,7 @@ public class StanfordNLP {
 			// parse tree
 			if (parse)
 				System.out.println(sentence.get(TreeAnnotation.class));
-			
+
 			// dependency graph
 			// https://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/semgraph/SemanticGraph.html
 			if (depparse) {
@@ -190,7 +190,7 @@ public class StanfordNLP {
 				for (SemanticGraphEdge edge : dependencies.edgeListSorted())
 					System.out.println(new StanfordDependency(edge));
 			}
-			
+
 			// well, let's just show the first one
 			break;
 		}
@@ -221,12 +221,12 @@ public class StanfordNLP {
 
 	void showParses(Annotation anno, String indent) {
 		List<CoreMap> sentences = anno.get(SentencesAnnotation.class);
-		for (CoreMap sentence : sentences) 
+		for (CoreMap sentence : sentences)
 			System.out.println(indent + sentence.get(TreeAnnotation.class));
 	}
-	
+
 	public void export(String docname, StanfordResult result, String filename) {
-	
+
 		try {
 			Annotation document = result.annotation;
 			StanfordWriter writer = new StanfordWriter();
@@ -248,7 +248,7 @@ public class StanfordNLP {
 					//	System.out.println(dep);
 					//	System.out.println(new StanfordDependency(dep)); }
 				}
-					
+
 				if (depparse) {
 					SemanticGraph dependencies = sentence.get(BasicDependenciesAnnotation.class);
 					IndexedWord root = dependencies.getFirstRoot();
@@ -258,7 +258,7 @@ public class StanfordNLP {
 					Set<IndexedWord> leaves = dependencies.getLeafVertices();
 					for (IndexedWord leaf : leaves) {
 						writer.addPath(
-							leaf, 
+							leaf,
 							dependencies.getPathToRoot(leaf),
 							dependencies.getShortestUndirectedPathEdges(leaf, root)); }
 				}

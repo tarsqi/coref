@@ -1,6 +1,7 @@
 package org.timeml.tarsqi.components;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,16 @@ import org.timeml.tarsqi.core.AnnotationLayer;
 import org.timeml.tarsqi.core.TarsqiDocument;
 import org.timeml.tarsqi.core.annotations.TreeAnnotation;
 import static org.timeml.tarsqi.definitions.Components.SECTIONER;
+
+/**
+ * Class to add section tags to a TarsqiDocument.
+ *
+ * This particular sectioner is written with THYME data in mind. In the future
+ * there may be more sectioners, in which case we would have subclasses.
+ *
+ * At the moment no tags are added, but section tags will be written to the
+ * standard output when you run the code.
+ */
 
 public class Sectioner {
 
@@ -33,12 +44,12 @@ public class Sectioner {
 		this.lines = new ArrayList();
 		this.sections = new ArrayList();
 	}
-	
+
 	/**
 	 * Take the text content of a TarsqiDocument and create simple document 
 	 * structure. 
 	 * 
-	 * Document structure now means adding section, Paragraph, Header, Line and
+	 * Document structure now means adding Section, Paragraph, Header, Line and
 	 * Listing markers. Initially, any white-line separated sub text will be
 	 * considered a section. Then sections are inspected using some simple 
 	 * heuristics to decide whether a section is a header or a listing. In 
@@ -110,7 +121,6 @@ public class Sectioner {
 	private void processSections() {
 		for (DocElement section : this.sections) {
 			if (section.isListing()) {
-				System.out.println(">>>" + section);
 				section.type = Sectioner.LISTING;
 			} else if (section.isHeader()) {
 				section.type = Sectioner.HEADER;
@@ -178,6 +188,5 @@ public class Sectioner {
 		for (DocElement section : this.sections)
 			section.addToTree(top);
 	}
-
 
 }

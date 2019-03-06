@@ -94,8 +94,8 @@ public class Annotation {
 	 * HashMap.
 	 *
 	 * @param node The XML Node the annotation is to be created from
-	 * @param begin
-	 * @param end
+	 * @param begin Beginning character offset of the annotation
+	 * @param end Ending character offset of the annotation
 	 */
 	public Annotation(Node node, int begin, int end) {
 		this.dom = node;
@@ -197,7 +197,11 @@ public class Annotation {
 		return sb.toString();
 	}
 
+	/**
+	 * For a regular annotation there is no defined tree size so return -1.
+	 * @return
+	 */
 	public int treeSize() {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		return -1;
 	}
 }

@@ -21,32 +21,42 @@ import org.timeml.tarsqi.tools.stanford.StanfordResult;
 
 public class Tarsqi {
 
-	// the processed thyme corpus with ttk and stanford output and the thyme text data
-	public static String THYME_CORPUS = "/DATA/resources/corpora/thyme/THYME-corpus-processed/";
-	public static String THYME_SOURCE = "/DATA/resources/corpora/thyme/THYME-corpus/TextData/";
+    // set to true when developing, should be false for released code
+    // TODO: this is an error-prone nightmare since who will check this variable,
+    // but at least we will not have to check all the switches below
+    private static final Boolean DEBUG = false;
 
 	// some switches that determine what piece of the code runs
 	public static boolean runStanfordOnThymeFiles = false;
 	public static boolean runStanfordOnThymeDirectory = false;
 	public static boolean loadTarsqiAndStanfordDocuments = false;
 	public static boolean runSectionerOnTestFile = false;
-	public static boolean runSectionerOnSectionerFile = false;
 	public static boolean runSectionerOnThyme = false;
 	public static boolean findAllCapsInThyme = false;
 	public static boolean loadTarsqiDocument = false;
-	public static boolean runTarsqiPipeline = true;
+	public static boolean runTarsqiPipeline = false;
+
+    // the processed thyme corpus with ttk and stanford output and the thyme text data
+	public static String THYME_CORPUS = "/DATA/resources/corpora/thyme/THYME-corpus-processed/";
+	public static String THYME_SOURCE = "/DATA/resources/corpora/thyme/THYME-corpus/TextData/";
+
 
 	public static void main(String[] args) {
 
-		if (runStanfordOnThymeFiles) runStanfordOnThymeFiles();
-		if (runStanfordOnThymeDirectory) runStanfordOnThymeDirectory();
-		if (loadTarsqiAndStanfordDocuments) loadTarsqiAndStanfordDocuments();
-		if (runSectionerOnTestFile) runSectioner("src/resources/test.ttk");
-		if (runSectionerOnSectionerFile) runSectioner("src/resources/sectioner.ttk");
-		if (runSectionerOnThyme) runSectionerOnThyme();
-		if (findAllCapsInThyme) findAllCapsInThyme();
-		if (loadTarsqiDocument) loadTarsqiDocument();
-		if (runTarsqiPipeline) runTarsqiPipeline("src/resources/tiny.ttk");
+        if (DEBUG) {
+            if (runStanfordOnThymeFiles) runStanfordOnThymeFiles();
+            if (runStanfordOnThymeDirectory) runStanfordOnThymeDirectory();
+            if (loadTarsqiAndStanfordDocuments) loadTarsqiAndStanfordDocuments();
+            if (runSectionerOnTestFile) runSectioner("src/resources/sectioner.ttk");
+            if (runSectionerOnThyme) runSectionerOnThyme();
+            if (findAllCapsInThyme) findAllCapsInThyme();
+            if (loadTarsqiDocument) loadTarsqiDocument();
+            if (runTarsqiPipeline) runTarsqiPipeline("src/resources/tiny.ttk"); }
+
+        if (args.length == 2 && args[0].equals("--sectioner")) {
+                String fname = args[1];
+                runSectioner(fname); }
+
 	}
 
 	/**

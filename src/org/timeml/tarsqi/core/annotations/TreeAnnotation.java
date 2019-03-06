@@ -39,6 +39,7 @@ public class TreeAnnotation extends Annotation {
 	 * 
 	 * @return The number of elements in the TreeAnnotation starting at this node.
 	 */
+	@Override
 	public int treeSize() {
 		int count = 1;
 		for (TreeAnnotation child : this.children) 

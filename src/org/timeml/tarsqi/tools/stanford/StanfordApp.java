@@ -199,5 +199,4 @@ public class StanfordApp {
 		String filename = THYME_SOURCE + "train/ID001_clinic_003";
 	}
 
-
 }
