@@ -19,22 +19,8 @@ import org.timeml.tarsqi.tools.stanford.StanfordDocument;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import org.timeml.tarsqi.tools.stanford.StanfordResult;
 
+
 public class Tarsqi {
-
-    // set to true when developing, should be false for released code
-    // TODO: this is an error-prone nightmare since who will check this variable,
-    // but at least we will not have to check all the switches below
-    private static final Boolean DEBUG = false;
-
-	// some switches that determine what piece of the code runs
-	public static boolean runStanfordOnThymeFiles = false;
-	public static boolean runStanfordOnThymeDirectory = false;
-	public static boolean loadTarsqiAndStanfordDocuments = false;
-	public static boolean runSectionerOnTestFile = false;
-	public static boolean runSectionerOnThyme = false;
-	public static boolean findAllCapsInThyme = false;
-	public static boolean loadTarsqiDocument = false;
-	public static boolean runTarsqiPipeline = false;
 
     // the processed thyme corpus with ttk and stanford output and the thyme text data
 	public static String THYME_CORPUS = "/DATA/resources/corpora/thyme/THYME-corpus-processed/";
@@ -43,21 +29,55 @@ public class Tarsqi {
 
 	public static void main(String[] args) {
 
-        if (DEBUG) {
-            if (runStanfordOnThymeFiles) runStanfordOnThymeFiles();
-            if (runStanfordOnThymeDirectory) runStanfordOnThymeDirectory();
-            if (loadTarsqiAndStanfordDocuments) loadTarsqiAndStanfordDocuments();
-            if (runSectionerOnTestFile) runSectioner("src/resources/sectioner.ttk");
-            if (runSectionerOnThyme) runSectionerOnThyme();
-            if (findAllCapsInThyme) findAllCapsInThyme();
-            if (loadTarsqiDocument) loadTarsqiDocument();
-            if (runTarsqiPipeline) runTarsqiPipeline("src/resources/tiny.ttk"); }
-
+		// sectioner
         if (args.length == 2 && args[0].equals("--sectioner")) {
                 String fname = args[1];
                 runSectioner(fname); }
 
+		// several batch-like top-level run commands
+        else if (args.length >= 3 && args[0].equals("--run")) {
+            if (args[1].equals("stanford") && args[2].equals("thyme"))
+				runStanfordOnThymeDirectory();
+			else if (args[1].equals("sectioner") && args[2].equals("thyme"))
+				runSectionerOnThyme();
+		}
+
+        // testing and statistics
+        else if (args.length >= 2 && args[0].equals("--test"))
+            test(args);
+        else if (args.length >= 3 && args[0].equals("--stats"))
+            stats(args);
+
 	}
+
+    /**
+     * Calling various tests given command line arguments. Assumes that the
+     * first argument is always --test and that there is at least a second
+     * argument
+     * @param args Array of command line arguments
+     */
+    private static void test(String[] args) {
+        if (args[1].equals("sectioner"))
+            runSectioner("src/resources/sectioner.ttk");
+		else if (args[1].equals("load-tarsqidoc"))
+			loadTarsqiDocument();
+		else if (args[1].equals("pipeline"))
+			runTarsqiPipeline("src/resources/test.ttk");
+		else if (args[1].equals("stanford") && args[2].equals("thyme"))
+			runStanfordOnThymeFiles();
+		else if (args[1].equals("load-tarsqi-stanford"))
+			loadTarsqiAndStanfordDocuments();
+    }
+
+    /**
+     * Calling various methods to print statistics. Assumes that the first
+     * argument is --stats and that there are three or more arguments in total.
+     * @param args Array of command line arguments
+     */
+    private static void stats(String[] args) {
+        if (args[1].equals("thyme") && args[2].equals("caps"))
+				findAllCapsInThyme();
+    }
 
 	/**
 	 * Run StanfordNLP on a couple of example thyme file that were processed
@@ -70,6 +90,8 @@ public class Tarsqi {
 		String[] reports = {
 			"ID001_clinic_001", "ID001_clinic_003", "ID009_clinic_025",
 			"doc0003_CLIN" };
+		// TODO: keeps adding annotators and writing to stdout about it for each
+		// file, can the writing be suppressed? (annotators are loaded only once)
 		for (String report : reports)
 			runStanfordOnFile(input_dir + report, output_dir + report);
 	}
@@ -94,6 +116,10 @@ public class Tarsqi {
 	 * processed by TTK.
 	 */
 	public static void runStanfordOnThymeDirectory() {
+		// Has errors on doc0003_CLIN, doc0003_PATH, doc0008_CLIN, doc0008_PATH,
+		// doc0019_CLIN, doc0019_PATH, doc0067_CLIN, doc0067_PATH, doc0104_CLIN,
+		// doc0104_PATH, doc0107_PATH, doc0121_CLIN, doc0121_PATH, doc0136_CLIN
+		// doc0136_PATH, doc0138_CLIN, doc0138_PATH and more
 		String IN = THYME_CORPUS + "train/ttk-output/thyme";
 		String OUT = THYME_CORPUS + "train/stanford-output/thyme";
 		File folder = new File(IN);
@@ -141,7 +167,7 @@ public class Tarsqi {
 	 *
 	 * @param filename Name of the input file
 	 */
-	private static void runSectioner(String filename) {
+	public static void runSectioner(String filename) {
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(filename);
 		Sectioner sectioner = new Sectioner(tarsqiDoc);
 		sectioner.parse();
