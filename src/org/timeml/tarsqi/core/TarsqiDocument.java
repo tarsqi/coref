@@ -14,6 +14,7 @@ import static org.timeml.tarsqi.definitions.Components.STANFORD_TAGGER;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import org.timeml.tarsqi.tools.stanford.StanfordResult;
 
+
 public class TarsqiDocument {
 
 	public String filename;
@@ -25,6 +26,10 @@ public class TarsqiDocument {
 	public ArrayList<TLink> tlinks;
 	public ArrayList<AnnotationLayer> layers;
 	public Map<String, AnnotationLayer> layerIdx;
+
+	public TarsqiDocument() {
+
+	}
 
 	public TarsqiDocument(String filename) {
 		this.filename = filename;
@@ -125,6 +130,7 @@ public class TarsqiDocument {
 			for (Annotation tag : sentence_tags)
 				layer.addAnnotation(tag);
 		}
+		layer.prettyPrint();
 		// TODO: export to TARSQI_TAGS layer
 	}
 
@@ -132,6 +138,17 @@ public class TarsqiDocument {
 	 * Run the chunker.
 	 */
 	public void runChunker() {
+	}
+
+	public void runAnnotators(String[] pipelineComponents) {
+		for (String element : pipelineComponents) {
+			if (element.equals("sectioner"))
+				this.runSectioner();
+		}
+	}
+
+	public void write(String output) {
+
 	}
 
 }

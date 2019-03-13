@@ -14,7 +14,7 @@ import org.timeml.tarsqi.core.TarsqiDocument;
 import org.timeml.tarsqi.core.AnnotationLayer;
 import org.timeml.tarsqi.core.annotations.Annotation;
 import org.timeml.tarsqi.core.annotations.AnnotationFactory;
-import org.w3c.dom.Document;	
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,14 +28,14 @@ import org.xml.sax.SAXException;
 public class TarsqiReader {
 
 	TarsqiDocument document;
-	
+
 	/**
 	 * Reads a file and creates a TarsqiDocument. The entire file content is
 	 * put as is in the TarsqiDocument text instance variable.
-	 * 
+	 *
 	 * @param filename The file to create a TarsqiDocument for
 	 * @return TarsqiDocument
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
 	public TarsqiDocument readTextFile(String filename) throws FileNotFoundException {
 		File file = new File(filename);
@@ -47,7 +47,7 @@ public class TarsqiReader {
 
 	/**
 	 * Read a file in the Tarsqi TTK format and create a TarsqiDocument.
-	 * 
+	 *
 	 * @param filename The name of a file
 	 * @return TarsqiDocument
 	 */
@@ -55,7 +55,7 @@ public class TarsqiReader {
 
 		File file = new File(filename);
 		this.document = new TarsqiDocument(file.getPath());
-		
+
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
@@ -75,9 +75,9 @@ public class TarsqiReader {
 
 	/**
 	 * Read the tags in the source_tags tag and add them to the TarsqiDocument.
-	 * 
+	 *
 	 * The source of the new layer will be SOURCE_TAGS.
-	 * 
+	 *
 	 * @param ttk the top-level element of the ttk document
 	 */
 	private void readSourceTags(Element ttk) {
@@ -89,12 +89,12 @@ public class TarsqiReader {
 			layer.addAnnotation(annotation);
 		}
 	}
-	
+
 	/**
 	 * Read the tags in the tarsqi_tags tag and add them to the TarsqiDocument.
-	 * 
+	 *
 	 * The source of the new layer will be TARSQI_TAGS.
-	 * 
+	 *
 	 * @param ttk the top-level element of the ttk document
 	 */
 	private void readTarsqiTags(Element ttk) {
@@ -113,7 +113,7 @@ public class TarsqiReader {
 	/**
 	 * Utility method to get the elements that are immediate children of the
 	 * element identified by a tag name.
-	 * 
+	 *
 	 * @param top the element in which you search for the element that you want
 	 * the children of
 	 * @param tagName the element that you want the children of

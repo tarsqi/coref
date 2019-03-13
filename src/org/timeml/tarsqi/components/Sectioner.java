@@ -1,7 +1,6 @@
 package org.timeml.tarsqi.components;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +33,11 @@ public class Sectioner {
 	static int MIN_ALL_CAPPS_LENGTH = 5;
 
 	static Pattern HEADER_PATTERN = Pattern.compile("^[A-Z ]+");
-	
+
 	TarsqiDocument doc;
 	List<DocElement> lines;
 	List<DocElement> sections;
-	
+
 	public Sectioner(TarsqiDocument doc) {
 		this.doc = doc;
 		this.lines = new ArrayList();
@@ -46,15 +45,15 @@ public class Sectioner {
 	}
 
 	/**
-	 * Take the text content of a TarsqiDocument and create simple document 
-	 * structure. 
-	 * 
+	 * Take the text content of a TarsqiDocument and create simple document
+	 * structure.
+	 *
 	 * Document structure now means adding Section, Paragraph, Header, Line and
 	 * Listing markers. Initially, any white-line separated sub text will be
-	 * considered a section. Then sections are inspected using some simple 
-	 * heuristics to decide whether a section is a header or a listing. In 
+	 * considered a section. Then sections are inspected using some simple
+	 * heuristics to decide whether a section is a header or a listing. In
 	 * addition, some section start with a section header and these headers
-	 * are split off. At the end, sections that consist of lines only are 
+	 * are split off. At the end, sections that consist of lines only are
 	 * replaced with a single paragraph.
 	 */
 	public void parse() {
@@ -65,9 +64,9 @@ public class Sectioner {
 	}
 
 	public List<DocElement> getLines() {
-		return this.lines;	
+		return this.lines;
 	}
-	
+
 	/**
 	 * Split the text content into a list of lines.
 	 */
@@ -91,7 +90,7 @@ public class Sectioner {
 
 	/**
 	 * Create sections from all the lines in the text.
-	 * 
+	 *
 	 * A section is a block of lines separated by one or more white lines.
 	 */
 	private void createSections() {
@@ -111,10 +110,10 @@ public class Sectioner {
 	}
 
 	/**
-	 * Check whether sections can be split and determine whether the section 
+	 * Check whether sections can be split and determine whether the section
 	 * is of a special type.
-	 * 
-	 * This is where all the interesting stuff starts, but at the moment there is 
+	 *
+	 * This is where all the interesting stuff starts, but at the moment there is
 	 * not that much of it. This will eventually also be a specific to a particular
 	 * domain or source.
 	 */
@@ -132,24 +131,24 @@ public class Sectioner {
 			}
 		}
 	}
-	
+
 	/**
 	 * Add an element to the sections field, but only if the element is not empty.
-	 * 
+	 *
 	 * @param element The DocElement to be added.
 	 */
 	private void addSection(DocElement element) {
 		if (! element.isEmpty())
 			this.sections.add(element);
 	}
-	
+
 	public void prettyPrint() {
 		System.out.println();
 		for (DocElement section : this.sections)
 			section.prettyPrint(System.out);
 		System.out.println();
 	}
-	
+
 	public void write(String filename) throws FileNotFoundException {
 		PrintStream ps = new PrintStream(filename);
 		for (DocElement section : this.sections)
@@ -158,7 +157,7 @@ public class Sectioner {
 
 	/**
 	 * Get all leaves from the document structure created by the sectioner.
-	 * 
+	 *
 	 * @return a List of Strings where each string is the content of a leave node
 	 */
 	public List<String> getSections() {

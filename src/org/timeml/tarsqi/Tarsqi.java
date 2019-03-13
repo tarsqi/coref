@@ -8,16 +8,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.timeml.tarsqi.components.DocElement;
 import org.timeml.tarsqi.components.Sectioner;
-import org.timeml.tarsqi.core.AnnotationLayer;
 import org.timeml.tarsqi.core.TarsqiDocument;
-import org.timeml.tarsqi.core.annotations.TreeAnnotation;
 import static org.timeml.tarsqi.definitions.Components.SECTIONER;
 import org.timeml.tarsqi.io.TarsqiReader;
 import org.timeml.tarsqi.tools.stanford.StanfordDocument;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import org.timeml.tarsqi.tools.stanford.StanfordResult;
+import org.timeml.tarsqi.utils.CLI;
 
 
 public class Tarsqi {
@@ -26,13 +27,18 @@ public class Tarsqi {
 	public static String THYME_CORPUS = "/DATA/resources/corpora/thyme/THYME-corpus-processed/";
 	public static String THYME_SOURCE = "/DATA/resources/corpora/thyme/THYME-corpus/TextData/";
 
+	private static boolean DEBUG = false;
 
 	public static void main(String[] args) {
 
+        // running a pipeline on a file
+        if (args.length > 0 && args[0].equals("--run"))
+            runPipeline(args);
+
 		// sectioner
-        if (args.length == 2 && args[0].equals("--sectioner")) {
-                String fname = args[1];
-                runSectioner(fname); }
+        else if (args.length == 2 && args[0].equals("--sectioner")) {
+            String fname = args[1];
+            runSectioner(fname); }
 
 		// several batch-like top-level run commands
         else if (args.length >= 3 && args[0].equals("--run")) {
@@ -47,17 +53,18 @@ public class Tarsqi {
             test(args);
         else if (args.length >= 3 && args[0].equals("--stats"))
             stats(args);
-
 	}
 
     /**
      * Calling various tests given command line arguments. Assumes that the
-     * first argument is always --test and that there is at least a second
-     * argument
+     * first argument is always --test.
+	 *
      * @param args Array of command line arguments
      */
     private static void test(String[] args) {
-        if (args[1].equals("sectioner"))
+        if (args.length == 1)
+			defaultTest();
+		else if (args[1].equals("sectioner"))
             runSectioner("src/resources/sectioner.ttk");
 		else if (args[1].equals("load-tarsqidoc"))
 			loadTarsqiDocument();
@@ -67,6 +74,8 @@ public class Tarsqi {
 			runStanfordOnThymeFiles();
 		else if (args[1].equals("load-tarsqi-stanford"))
 			loadTarsqiAndStanfordDocuments();
+		else
+			System.out.println("No available test for given options");
     }
 
     /**
@@ -80,7 +89,7 @@ public class Tarsqi {
     }
 
 	/**
-	 * Run StanfordNLP on a couple of example thyme file that were processed
+	 * Run StanfordNLP on a couple of example Thyme files that were processed
 	 * by TTK.
 	 */
 	static void runStanfordOnThymeFiles() {
@@ -148,10 +157,10 @@ public class Tarsqi {
 		String tarsqiDir = THYME_CORPUS + "train/ttk-output/";
 		String stanfordDir = THYME_CORPUS + "train/stanford-output/";
 		String[] reports = { "ID001_clinic_001", "ID001_clinic_003" };
-		for (int i = 0 ; i < reports.length ; i++) {
-			System.out.println(reports[i]);
-			String tarsqiFile = tarsqiDir + reports[i];
-			String stanfordFile = stanfordDir + reports[i];
+		for (String report : reports) {
+			System.out.println(report);
+			String tarsqiFile = tarsqiDir + report;
+			String stanfordFile = stanfordDir + report;
 			TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
 			StanfordDocument stanfordDoc = new StanfordDocument(stanfordFile);
 			System.out.println();
@@ -169,9 +178,7 @@ public class Tarsqi {
 	 */
 	public static void runSectioner(String filename) {
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(filename);
-		Sectioner sectioner = new Sectioner(tarsqiDoc);
-		sectioner.parse();
-		sectioner.prettyPrint();
+		tarsqiDoc.runSectioner();
 	}
 
 	/**
@@ -269,10 +276,47 @@ public class Tarsqi {
 		tarsqiDoc.runSectioner();
 		tarsqiDoc.runTagger();
 		tarsqiDoc.runChunker();
+		System.out.println();
 		tarsqiDoc.prettyPrint();
-		AnnotationLayer layer = tarsqiDoc.getLayer(SECTIONER);
-		TreeAnnotation top = (TreeAnnotation) layer.annotations.get(0);
-		top.prettyPrint();
+		System.out.println();
+		tarsqiDoc.getLayer(SECTIONER).prettyPrint();
 	}
 
+    private static void runPipeline(String[] args) {
+
+        Options options = new Options();
+        options.addOption("r", "run", false, "run flag");
+        options.addOption("p", "pipeline", true, "pipeline");
+        options.addOption("i", "input", true, "input file");
+        options.addOption("o", "output", true, "output file");
+        options.addOption("t", "input-type", true, "type of input file: text or ttk");
+        options.addOption("d", "debug", false, "debugging flag");
+
+        CommandLine cmd = CLI.parse(options, args);
+        String pipeline = cmd.getOptionValue("pipeline");
+        String inputType = cmd.getOptionValue("input-type");
+        String input = cmd.getOptionValue("input");
+        String output = cmd.getOptionValue("output");
+		if (cmd.hasOption("debug"))
+			DEBUG = true;
+
+		if (DEBUG)
+			CLI.prettyPrint(cmd);
+
+		//TarsqiDocument tarsqiDoc = new TarsqiDocument(inputFilePath);
+		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(input);
+		String[] pipelineComponents = pipeline.split(",");
+		tarsqiDoc.runAnnotators(pipelineComponents);
+        tarsqiDoc.prettyPrint();
+		tarsqiDoc.write(output);
+	}
+
+
+	/**
+	 * Method to run default test. Utility method for quick experimentation
+	 * that you can run if all you have is the --test option.
+	 */
+	private static void defaultTest() {
+
+	}
 }

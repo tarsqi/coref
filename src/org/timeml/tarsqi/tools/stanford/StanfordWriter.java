@@ -20,12 +20,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class StanfordWriter {
-	
+
 	Document doc;
 	Element root, file, sentence, tokens, parse, dependencies;
-	
+
 	public StanfordWriter() throws ParserConfigurationException {
-		
+
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		dBuilder = dbFactory.newDocumentBuilder();
@@ -35,15 +35,15 @@ public class StanfordWriter {
 		this.dependencies = this.doc.createElement("dependencies");
 		this.doc.appendChild(root);
 		this.root.appendChild(file);
-	}	
+	}
 
 	void setFileName(String docname) {
-		
+
 		Attr attr = doc.createAttribute("name");
         attr.setValue(docname);
         this.file.setAttributeNode(attr);
 	}
-	
+
 	public void addSentence() {
 
 		this.sentence = this.doc.createElement("sentence");
@@ -55,12 +55,12 @@ public class StanfordWriter {
 		this.sentence.appendChild(this.parse);
 		this.sentence.appendChild(this.dependencies);
 	}
-	
+
 	public void addToken(StanfordToken token) {
 
 		Attr attr;
 		Element tok = doc.createElement("token");
-		String[][] attrs = { 
+		String[][] attrs = {
 			pair("index", token.index),
 			pair("start", token.start),
 			pair("end", token.end),
@@ -79,12 +79,12 @@ public class StanfordWriter {
 	}
 
 	public void addParse(String parse) {
-		
+
 		Element tree = doc.createElement("tree");
 		tree.appendChild(doc.createTextNode(parse));
-		this.parse.appendChild(tree);		
+		this.parse.appendChild(tree);
 	}
-	
+
 	void addPathsToRoot(Tree tree, Tree leaf) {
 		// Not sure how to do this, and may not do it anyway because the parser
 		// as I use it is just way to slow
@@ -98,20 +98,20 @@ public class StanfordWriter {
 	}
 
 	public void addDependency(StanfordDependency stanfordDependency) {
-		
+
 		Attr attr;
 		Element dep = doc.createElement("dependency");
-		String[][] attrs = { 
+		String[][] attrs = {
 			pair("relation", stanfordDependency.relation),
 			pair("governor", stanfordDependency.governor.index),
 			pair("dependent", stanfordDependency.dependent.index) };
 		addAttrs(dep, attrs);
-		this.dependencies.appendChild(dep);		
+		this.dependencies.appendChild(dep);
 	}
 
 	public void addPath(
-			IndexedWord leaf, 
-			List<IndexedWord> catpath, 
+			IndexedWord leaf,
+			List<IndexedWord> catpath,
 			List<SemanticGraphEdge> relpath) {
 
 		StringBuilder sb = new StringBuilder();
@@ -130,29 +130,29 @@ public class StanfordWriter {
 		Element path = doc.createElement("path");
 		String[][] attrs = {
 			pair("leaf", leaf.index()),
-			pair("cats", cats), 
-			pair("rels", rels) }; 
+			pair("cats", cats),
+			pair("rels", rels) };
 		addAttrs(path, attrs);
 		this.dependencies.appendChild(path);
 	}
-	
+
 	private String[] pair(String attr, int val) {
 
 		String[] pair = { attr, Integer.toString(val) };
 		return pair; }
-	
+
 	private String[] pair(String attr, String val) {
 
 		String[] pair = { attr, val };
 		return pair; }
-	
+
 	private void addAttrs(Element element, String[][] attrs) {
 
 		for (int i = 0 ; i < attrs.length ; i++) {
 			Attr attr = doc.createAttribute(attrs[i][0]);
 			attr.setValue(attrs[i][1]);
 			element.setAttributeNode(attr); }}
-	
+
 	public void write(String filename) throws TransformerException {
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -168,6 +168,6 @@ public class StanfordWriter {
 			StreamResult consoleResult = new StreamResult(System.out);
 	        transformer.transform(source, consoleResult);
 		}
-	} 
+	}
 
 }
