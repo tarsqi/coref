@@ -122,10 +122,16 @@ public class StanfordNLP {
 	}
 
 	public void processTarsqiFile(String tarsqiFile, String stanfordFile) {
+		//System.out.println("Processing Tarsqi file");
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(tarsqiFile);
+		processTarsqiDocument(tarsqiDoc, stanfordFile);
+	}
+
+	public void processTarsqiDocument(TarsqiDocument tarsqiDoc, String stanfordFile) {
+		//System.out.println("Processing Tarsqi document");
+		String tarsqiFile = tarsqiDoc.filename;
 		StanfordResult result = this.processString(tarsqiDoc.text);
 		result.getResultsAsTagList();
-		//this.show(anno);
 		// TODO: instead add the annotation to the TarsqiDocument
 		this.export(tarsqiFile, result, stanfordFile);
 	}
@@ -142,10 +148,12 @@ public class StanfordNLP {
 	}
 
 	private String annotators(String components) {
-		Set<String> comps = new HashSet(Arrays.asList(components.split("\\s+")));
+		//Set<String> comps = new HashSet(Arrays.asList(components.split("\\s+")));
+		Set<String> comps = new HashSet(Arrays.asList(components.split(",")));
 		//List<String> x = new ArrayList<>();
 		// always use basic processing
 		StringBuilder sb = new StringBuilder("tokenize, ssplit, pos, lemma");
+		//System.out.println(comps);
 		if (comps.contains("ner")) {
 			this.ner = true;
 			sb.append(", ner"); }

@@ -187,7 +187,8 @@ public class StanfordResult {
 }
 
 
-	class Pair {
+// Not sure why this is here and what it is intended for.
+class Pair {
 
 	Tree tree;
 	Annotation parent;
@@ -199,6 +200,7 @@ public class StanfordResult {
 		this.parentAnnotation = parentAnnotation;
 	}
 }
+
 
 class IdentifierFactory {
 

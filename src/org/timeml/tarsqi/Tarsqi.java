@@ -24,16 +24,17 @@ import org.timeml.tarsqi.utils.CLI;
 public class Tarsqi {
 
     // the processed thyme corpus with ttk and stanford output and the thyme text data
-	public static String THYME_CORPUS = "/DATA/resources/corpora/thyme/THYME-corpus-processed/";
-	public static String THYME_SOURCE = "/DATA/resources/corpora/thyme/THYME-corpus/TextData/";
+	// TODO: this should not be hardcoded here
+	public static final String THYME_CORPUS = "/DATA/resources/corpora/thyme/THYME-corpus-processed/";
+	public static final String THYME_SOURCE = "/DATA/resources/corpora/thyme/THYME-corpus/TextData/";
 
 	private static boolean DEBUG = false;
 
 	public static void main(String[] args) {
 
-        // running a pipeline on a file
+        // running a pipeline or tool on a file
         if (args.length > 0 && args[0].equals("--run"))
-            runPipeline(args);
+            run(args);
 
 		// sectioner
         else if (args.length == 2 && args[0].equals("--sectioner")) {
@@ -49,7 +50,7 @@ public class Tarsqi {
 		}
 
         // testing and statistics
-        else if (args.length >= 2 && args[0].equals("--test"))
+        else if (args.length >= 1 && args[0].equals("--test"))
             test(args);
         else if (args.length >= 3 && args[0].equals("--stats"))
             stats(args);
@@ -272,6 +273,7 @@ public class Tarsqi {
 	}
 
 	private static void runTarsqiPipeline(String filename) {
+		// DEPRECATED; but still used in a test
 		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(filename);
 		tarsqiDoc.runSectioner();
 		tarsqiDoc.runTagger();
@@ -282,41 +284,78 @@ public class Tarsqi {
 		tarsqiDoc.getLayer(SECTIONER).prettyPrint();
 	}
 
-    private static void runPipeline(String[] args) {
+    private static void run(String[] args) {
 
         Options options = new Options();
         options.addOption("r", "run", false, "run flag");
-        options.addOption("p", "pipeline", true, "pipeline");
+        options.addOption("t", "tool", true, "tool to run");
+        options.addOption("p", "pipeline", true, "pipeline to run");
         options.addOption("i", "input", true, "input file");
         options.addOption("o", "output", true, "output file");
-        options.addOption("t", "input-type", true, "type of input file: text or ttk");
+        options.addOption("T", "input-type", true, "type of input file: text or ttk");
         options.addOption("d", "debug", false, "debugging flag");
 
         CommandLine cmd = CLI.parse(options, args);
+		if (cmd.hasOption("debug")) {
+			Tarsqi.DEBUG = true;
+			CLI.prettyPrint(cmd); }
+
+		if (cmd.hasOption("pipeline"))
+			runPipeline(cmd);
+		else if (cmd.hasOption("tool"))
+			runTool(cmd);
+	}
+
+	/**
+	 * Run a pipeline of Tarsqi components on a file. These are the traditional
+	 * TARSQI components used in the old Python version. This is a placeholder
+	 * for future functionality, currently we only have a tagger and sectioner
+	 * partially implemented (and he sectioner isn't really a classic Tarsqi
+	 * component).
+	 *
+	 * @param cmd parsed command line options
+	 */
+    private static void runPipeline(CommandLine cmd) {
         String pipeline = cmd.getOptionValue("pipeline");
         String inputType = cmd.getOptionValue("input-type");
         String input = cmd.getOptionValue("input");
         String output = cmd.getOptionValue("output");
-		if (cmd.hasOption("debug"))
-			DEBUG = true;
-
-		if (DEBUG)
-			CLI.prettyPrint(cmd);
-
-		//TarsqiDocument tarsqiDoc = new TarsqiDocument(inputFilePath);
-		TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(input);
+		TarsqiDocument tarsqiDoc = new TarsqiReader().readFile(input, inputType);
 		String[] pipelineComponents = pipeline.split(",");
 		tarsqiDoc.runAnnotators(pipelineComponents);
         tarsqiDoc.prettyPrint();
 		tarsqiDoc.write(output);
 	}
 
+	/**
+	 * Run a tool that is integrated with Tarsqi in some way. At the moment all
+	 * we have is the Stanford Dependency parser.
+	 *
+	 * Note that there is no well-defined distinction between running a pipeline
+	 * and running a tool and this command may be merged with runPipeline().
+	 *
+	 * @param cmd parsed command line options
+	 */
+    private static void runTool(CommandLine cmd) {
+        String tool = cmd.getOptionValue("tool");
+        String input = cmd.getOptionValue("input");
+        String output = cmd.getOptionValue("output");
+		if (tool.equals("stanford")) {
+			// run the Stanford dependency parser, assumes input is a ttk file
+			// the depparse gives us path to top for both syntactic categories and
+			// dependencies so we don't need to use another parser
+			StanfordNLP stan = new StanfordNLP("depparse");
+			stan.processTarsqiFile(input, output); }
+	}
 
 	/**
-	 * Method to run default test. Utility method for quick experimentation
-	 * that you can run if all you have is the --test option.
+	 * Run default test. Utility method for quick experimentation that runs
+	 * if all you have is the --test option.
 	 */
 	private static void defaultTest() {
-
+		// the depparse gives us path to top for both syntactic categories and
+		// dependencies so we don't need to use another parser
+		StanfordNLP stan = new StanfordNLP("depparse");
+		stan.processTarsqiFile("src/resources/test.ttk", "out.stanford.xml");
 	}
 }

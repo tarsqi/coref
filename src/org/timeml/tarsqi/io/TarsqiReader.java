@@ -10,10 +10,13 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.timeml.tarsqi.Tarsqi;
 import org.timeml.tarsqi.core.TarsqiDocument;
 import org.timeml.tarsqi.core.AnnotationLayer;
 import org.timeml.tarsqi.core.annotations.Annotation;
 import org.timeml.tarsqi.core.annotations.AnnotationFactory;
+import static org.timeml.tarsqi.definitions.FileTypes.TEXT;
+import static org.timeml.tarsqi.definitions.FileTypes.TTK;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,16 +25,37 @@ import org.xml.sax.SAXException;
 
 /**
  * The sole tasks of this class is to take a filename and create an instance of
- * TarsqiDocument. It has public static methods for two kinds of input files:
- * regular text files and files in the Tarsqi TTK format.
+ * TarsqiDocument.
  */
 public class TarsqiReader {
 
-	TarsqiDocument document;
+	TarsqiDocument document = null;
+
 
 	/**
-	 * Reads a file and creates a TarsqiDocument. The entire file content is
-	 * put as is in the TarsqiDocument text instance variable.
+	 * Read a file and return a TarsqiDocument for that file.
+	 *
+	 * @param filename path to the file
+	 * @param inputType type of the file (text, ttk,...)
+	 * @return the TarsqiDocument for the file
+	 */
+	public TarsqiDocument readFile(String filename, String inputType) {
+		if (inputType.equals(TTK))
+			readTarsqiFile(filename);
+			//tarsqiDoc = new TarsqiReader().readTarsqiFile(filename);
+		else if (inputType.equals(TEXT))
+			try {
+				readTextFile(filename);
+			} catch (FileNotFoundException ex) {
+				Logger.getLogger(Tarsqi.class.getName()).log(Level.SEVERE, null, ex);
+				System.exit(0);
+			}
+		return this.document;
+	}
+
+	/**
+	 * Reads a text file and creates a TarsqiDocument. The entire file content
+	 * is put as is in the TarsqiDocument text instance variable.
 	 *
 	 * @param filename The file to create a TarsqiDocument for
 	 * @return TarsqiDocument
