@@ -48,7 +48,7 @@ public class StanfordResult {
 	public ArrayList<ArrayList<Annotation>> getResultsAsTagList() {
 
 		// TODO: make sure that identifiers are unique. Now the code in
-		// addSentenceTags() and addConstituentTags() is independents from each
+		// addSentenceTags() and addConstituentTags() is independent from each
 		// other and duplicates identifiers. The easiest way would be to create
 		// an IdentifierFactory at this level (but perhaps have one for each
 		// sentenceand hand it over to the subroutines.
@@ -166,7 +166,7 @@ public class StanfordResult {
 		// you get these even when you simply run the parse annotator
 		SemanticGraph dependencies = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
 		if (dependencies != null) {
-			System.out.println("\n" + dependencies);
+			//System.out.println("\n" + dependencies);
 			IndexedWord root = dependencies.getFirstRoot();
 			//writer.addRoot(new StanfordToken(root));
 			for (SemanticGraphEdge edge : dependencies.edgeListSorted()) {
@@ -175,6 +175,8 @@ public class StanfordResult {
 			//writer.addDependency(new StanfordDependency(edge));
 			Set<IndexedWord> leaves = dependencies.getLeafVertices();
 			for (IndexedWord leaf : leaves) {
+				// TODO: This is all actually done in StanfordNLP.export()
+				// TODO: Must clean this up
 				//writer.addPath(
 				//	leaf,
 				//	dependencies.getPathToRoot(leaf),

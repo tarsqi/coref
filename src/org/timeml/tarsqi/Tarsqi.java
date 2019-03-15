@@ -19,6 +19,7 @@ import org.timeml.tarsqi.tools.stanford.StanfordDocument;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import org.timeml.tarsqi.tools.stanford.StanfordResult;
 import org.timeml.tarsqi.utils.CLI;
+import static org.timeml.tarsqi.utils.File.getFiles;
 
 
 public class Tarsqi {
@@ -248,19 +249,6 @@ public class Tarsqi {
 			for (DocElement line : caps.get(key))
 				System.out.println("   " + line);
 		}
-	}
-
-	/**
-	 * Return a sorted list of file names in a directory.
-	 *
-	 * @param dirname The name of the directory
-	 * @return An array of filenames, not including the path.
-	 */
-	private static String[] getFiles(String dirname) {
-		File dir = new File(dirname);
-		String[] files = dir.list();
-		Arrays.sort(files);
-		return files;
 	}
 
 	/**

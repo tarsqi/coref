@@ -27,9 +27,6 @@ public class TarsqiDocument {
 	public ArrayList<AnnotationLayer> layers;
 	public Map<String, AnnotationLayer> layerIdx;
 
-	public TarsqiDocument() {
-
-	}
 
 	public TarsqiDocument(String filename) {
 		this.filename = filename;
@@ -84,8 +81,13 @@ public class TarsqiDocument {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("<TarsqiDocument '%s'>", this.filename);
+	}
+
 	public void prettyPrint() {
-		System.out.println(String.format("<TarsqiDocument '%s'>", this.filename));
+		System.out.println(this);
 		int max = 3;
 		for (AnnotationLayer layer : this.layers) {
 			System.out.println("   " + layer); }

@@ -132,7 +132,7 @@ public class StanfordNLP {
 		String tarsqiFile = tarsqiDoc.filename;
 		StanfordResult result = this.processString(tarsqiDoc.text);
 		result.getResultsAsTagList();
-		// TODO: instead add the annotation to the TarsqiDocument
+		// NOTE: maybe instead add the annotation to the TarsqiDocument
 		this.export(tarsqiFile, result, stanfordFile);
 	}
 
