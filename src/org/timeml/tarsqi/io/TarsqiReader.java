@@ -36,10 +36,13 @@ public class TarsqiReader {
 	 * Read a file and return a TarsqiDocument for that file.
 	 *
 	 * @param filename path to the file
-	 * @param inputType type of the file (text, ttk,...)
+	 * @param inputType type of the file (text, ttk,...), if this is null then
+     * the default value is used (text)
 	 * @return the TarsqiDocument for the file
 	 */
 	public TarsqiDocument readFile(String filename, String inputType) {
+        if (inputType == null)
+            inputType = TEXT;
 		if (inputType.equals(TTK))
 			readTarsqiFile(filename);
 			//tarsqiDoc = new TarsqiReader().readTarsqiFile(filename);

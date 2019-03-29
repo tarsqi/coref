@@ -5,9 +5,7 @@ import java.io.File;
 import java.util.List;
 import org.timeml.tarsqi.io.ThymeFile;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
-import org.timeml.tarsqi.core.TarsqiDocument;
-import org.timeml.tarsqi.io.TarsqiReader;
-import static org.timeml.tarsqi.utils.File.getFiles;
+import static org.timeml.tarsqi.utils.File.getFileNames;
 
 
 public class Coref {
@@ -30,44 +28,54 @@ public class Coref {
 			String outputDir = args[2];
 			runStanford(inputDir, outputDir);
 		}
+		else if (args[0].equals("--train")) {
+			String ecbDir = args[1];
+			String depparseDir = args[2];
+			String trainDir = args[3];
+			train(ecbDir, depparseDir, trainDir);
+		}
 	}
 
 
 	/**
-	 * Run the Stanford dependency parser on ECB files.
+	 * Run the Stanford dependency parser on TTK files in a directory tree.
 	 *
-	 * @param inputDir the directory with ECB files in TTK format, this is the
-	 * directory that contains the data directory that has all of the topic
-	 * directories and was created offline (by utilities/convert.py in
-	 * https://github.com/tarsqi/ttk
-	 *
-	 * @param outputDir directory to write the output to
-	 *
-	 * TODO: this code is too much tied in to ECB, should have a different flow,
-	 * either by handing in a directory with ttk files (with ttk extensions) that
-	 * can be walked or by giving a list of ttk files.
-	 *
-	 * NOTE: the TODO above and the description of inputDIr are actually
-	 * anticipating code that runs on all topics, note that now the input needs
-	 * to be a single topic directory.
+	 * @param inputDir directory with files in TTK format
+	 * @param outputDir directory to write the output to, will have the same
+	 * internal structure as inputDir
 	 */
 	public static void runStanford(String inputDir, String outputDir) {
 
+		StanfordNLP parser = new StanfordNLP("depparse");
+        System.out.println("SOURCE: " + inputDir + "\nTARGET: " + outputDir + "\n");
+        runDependencyParserOnDirectory(parser, inputDir, outputDir);
+	}
+
+   	public static void runDependencyParserOnDirectory(
+            StanfordNLP parser, String inputDir, String outputDir) {
+
+        System.out.println("\n" + inputDir + "\n");
 		new File(outputDir).mkdir();
-		StanfordNLP stan = new StanfordNLP("depparse");
 
-
-		String[] ecb_files = getFiles(inputDir);
-		for (String file : ecb_files) {
-			String infile = inputDir + "/" + file;
-			//System.out.println(infile);
-			String outfile = outputDir + "/" + file;
-			//System.out.println(infile);
-			TarsqiDocument tarsqiDoc = new TarsqiReader().readTarsqiFile(infile);
-			System.out.println(tarsqiDoc);
-			stan.processTarsqiFile(infile, outfile);
+		String[] fnames = getFileNames(inputDir);
+		for (String fname : fnames) {
+ 			String inpath = inputDir + "/" + fname;
+			String outpath = outputDir + "/" + fname;
+            File file = new File(inpath);
+            if (file.isDirectory())
+                runDependencyParserOnDirectory(parser, inpath, outpath);
+            else
+                runDependencyParserOnFile(parser, inpath, outpath);
 		}
 	}
+
+    public static void runDependencyParserOnFile(
+            StanfordNLP parser, String inFile, String outFile) {
+
+        System.out.println("   " + inFile);
+		parser.processTarsqiFile(inFile, outFile);
+    }
+
 
 	public static void thymeExperiment(String[] args) {
 		/*
@@ -80,6 +88,17 @@ public class Coref {
 		System.out.println(data.get(0).text.substring(start, end));
 		//runStanford(data.get(0).text.substring(start, end));
 		*/
+	}
+
+	private static void train(String ecbDir, String depparseDir, String trainDir) {
+		System.out.println(ecbDir + "\n" + depparseDir + "\n" + trainDir);
+		// OFFLINE adjust converter to also print text files
+		// OFFLINE run TTK on all ECB TarsqiDocuments
+		// LOAD ECB files and create TarsqiDocuments
+		// LOAD ECB annotations
+		// LOAD dependency parses
+		// ADD chain attributes to events
+		// ADD dependency parses to TarsqiDocuments (paths to top to events)
 	}
 
 }

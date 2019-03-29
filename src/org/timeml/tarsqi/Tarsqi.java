@@ -19,7 +19,7 @@ import org.timeml.tarsqi.tools.stanford.StanfordDocument;
 import org.timeml.tarsqi.tools.stanford.StanfordNLP;
 import org.timeml.tarsqi.tools.stanford.StanfordResult;
 import org.timeml.tarsqi.utils.CLI;
-import static org.timeml.tarsqi.utils.File.getFiles;
+import static org.timeml.tarsqi.utils.File.getFileNames;
 
 
 public class Tarsqi {
@@ -190,7 +190,7 @@ public class Tarsqi {
 	private static void runSectionerOnThyme() {
 
 		String thymeDir = THYME_SOURCE + "train/";
-		String[] files = getFiles(thymeDir);
+		String[] files = getFileNames(thymeDir);
 		String outDir = "build/out/";
 		new File(outDir).mkdir();
 		int count = 0;
@@ -220,7 +220,7 @@ public class Tarsqi {
 		// instances where a line starts with a sequence of all capitalized
 		// words.
 		String thymeDir = THYME_SOURCE + "train/";
-		String[] files = getFiles(thymeDir);
+		String[] files = getFileNames(thymeDir);
 		Map<String, ArrayList<DocElement>> caps = new HashMap<>();
 		int count = 0;
 		for (String file : files) {
