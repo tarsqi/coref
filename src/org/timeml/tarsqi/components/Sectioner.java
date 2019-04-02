@@ -178,8 +178,10 @@ public class Sectioner {
 	 * so its annotations list will have only one element.
 	 */
 	public void exportSections() {
-		// TODO: maybe this should be done in TarsqiDocument so the sectioner
-		// needs less knowledge of other classes
+		// TODO: maybe this should be done in TarsqiDocument or AnnotationLayer
+		// so the sectioner needs less knowledge of other classes (well, maybe,
+		// but only if the other class receives some tree-like datastructure with
+		// a set of fixed accessors and elements woith fixed interfaces).
 		AnnotationLayer layer = new AnnotationLayer(SECTIONER, "tree");
 		TreeAnnotation top = new TreeAnnotation(DOCUMENT);
 		layer.addAnnotation(top);

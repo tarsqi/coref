@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.timeml.tarsqi.components.Sectioner;
+import static org.timeml.tarsqi.core.AnnotationLayer.SOURCE_TAGS;
+import static org.timeml.tarsqi.core.AnnotationLayer.TARSQI_TAGS;
 import org.timeml.tarsqi.core.annotations.ALink;
 import org.timeml.tarsqi.core.annotations.Annotation;
 import org.timeml.tarsqi.core.annotations.Event;
@@ -17,15 +19,23 @@ import org.timeml.tarsqi.tools.stanford.StanfordResult;
 
 public class TarsqiDocument {
 
+	/** path to the source file */
 	public String filename;
+
+	/** the text, without annotations */
 	public String text;
-	public ArrayList<Event> events;
+
+	/** a list of annotation layers */
+    public ArrayList<AnnotationLayer> layers;
+
+	/** annotation layers indexed on the name of the layer */
+	public Map<String, AnnotationLayer> layerIdx;
+
+    public ArrayList<Event> events;
 	public ArrayList<Timex> timexes;
 	public ArrayList<ALink> alinks;
 	public ArrayList<SLink> slinks;
 	public ArrayList<TLink> tlinks;
-	public ArrayList<AnnotationLayer> layers;
-	public Map<String, AnnotationLayer> layerIdx;
 
 
 	public TarsqiDocument(String filename) {
@@ -39,8 +49,12 @@ public class TarsqiDocument {
 		this.layerIdx = new HashMap<>();
 	}
 
+	public AnnotationLayer getSourceLayer() {
+		return this.layerIdx.get(SOURCE_TAGS);
+	}
+
 	public AnnotationLayer getTarsqiLayer() {
-		return this.layerIdx.get("TARSQI_TAGS");
+		return this.layerIdx.get(TARSQI_TAGS);
 	}
 
 	public AnnotationLayer getLayer(String name) {
@@ -114,6 +128,8 @@ public class TarsqiDocument {
 		// this exports the sections from the sectioner to a layer on the
 		// TarsqiDocument stored on the sectioner
 		sectioner.exportSections();
+		//System.out.println(this.layers.get(2).annotations.get(0).getClass());
+		//System.out.println(this.layers.get(2).annotations.get(0));
 	}
 
 	/**

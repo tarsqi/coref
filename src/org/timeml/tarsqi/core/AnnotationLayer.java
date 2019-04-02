@@ -8,10 +8,10 @@ import org.timeml.tarsqi.core.annotations.TreeAnnotation;
 /**
  * Class that stores annotations and that allows you to group annotations. An
  * annotation can be for a single component, for example the sectioner will
- * write to its own layer. There are also two hard-wired layers that correspond
- * to the classical layers used by Tarsqi: TARSQI_TAGS and SOURCE_TAGS. Both
- * contain a variety of tags, which for the TARSQI_TAGS layer includes all tags
- * from Tarsqi components (docelement, s, lex, TIMEX3, EVENT, ALINK, SLINK and
+ * write to its own layer. There are also two layers that correspond to the
+ * classical layers used by Tarsqi: TARSQI_TAGS and SOURCE_TAGS. Both contain
+ * a variety of tags, which for the TARSQI_TAGS layer includes all tags from
+ * Tarsqi components (docelement, s, lex, TIMEX3, EVENT, ALINK, SLINK and
  * TLINK).
  *
  * A layer can be of two types: "flat" and "tree". With the former the layer has
@@ -20,6 +20,10 @@ import org.timeml.tarsqi.core.annotations.TreeAnnotation;
  * is the top of a tree.
  */
 public class AnnotationLayer {
+
+	public static final String SOURCE_TAGS = "SOURCE_TAGS";
+	public static final String TARSQI_TAGS = "TARSQI_TAGS";
+	public static final String STANFORD_DEPENDENCIES = "STANFORD_DEPENDENCIES";
 
 	/**
 	 * Name of the annotation layer. Could be the name of the component that

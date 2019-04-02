@@ -23,10 +23,12 @@ public class DocElement {
 	public int start;
 	public int end;
 	public String type;
+
 	TarsqiDocument doc;
 	String text;
 	String prefix;
 	List<DocElement> dtrs;
+
 
 	DocElement(TarsqiDocument doc, String type, int start, int end) {
 		init(doc, type, start, end);
